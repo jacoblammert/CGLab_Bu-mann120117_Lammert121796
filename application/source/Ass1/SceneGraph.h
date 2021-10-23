@@ -5,15 +5,21 @@
 #ifndef OPENGLFRAMEWORK_SCENEGRAPH_H
 #define OPENGLFRAMEWORK_SCENEGRAPH_H
 
+#include <string>
+#include <vector>
+#include string
+
 
 class SceneGraph {
+public:
+    SceneGraph();
 
-
+    std::string getName();
 
 
 private:
     std::String name = "";
-    Node root;
+    void setName(std::string cost& name);
 
 };
 

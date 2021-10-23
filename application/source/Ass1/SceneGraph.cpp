@@ -10,6 +10,6 @@ std::string SceneGraph::getName(){
     return name;
 }
 
-void SceneGraph::setName(std::string const& name){
-    name = name;
+void SceneGraph::setName(std::string name){
+    this->name = name;
 }

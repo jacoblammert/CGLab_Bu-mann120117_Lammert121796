@@ -7,7 +7,6 @@
 
 #include <string>
 #include <vector>
-#include string
 
 
 class SceneGraph {
@@ -18,8 +17,8 @@ public:
 
 
 private:
-    std::String name = "";
-    void setName(std::string cost& name);
+    std::string name = "";
+    void setName(std::string name);
 
 };
 

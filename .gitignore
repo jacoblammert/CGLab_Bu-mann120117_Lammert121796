@@ -4,3 +4,4 @@ install
 *.sublime-workspace
 *~
 .DS_Store 
+/cmake-build-debug/

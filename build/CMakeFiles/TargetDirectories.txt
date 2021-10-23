@@ -1,0 +1,14 @@
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/CMakeFiles/framework.dir
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/CMakeFiles/solar_system.dir
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/CMakeFiles/INSTALL.dir
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/CMakeFiles/ALL_BUILD.dir
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/CMakeFiles/ZERO_CHECK.dir
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/external/glfw-3.1.1/CMakeFiles/INSTALL.dir
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/external/glfw-3.1.1/CMakeFiles/ALL_BUILD.dir
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/external/glfw-3.1.1/src/CMakeFiles/glfw.dir
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/external/glfw-3.1.1/src/CMakeFiles/INSTALL.dir
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/external/glbinding-2.1.1/CMakeFiles/INSTALL.dir
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/external/glbinding-2.1.1/CMakeFiles/ALL_BUILD.dir
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/external/glbinding-2.1.1/source/CMakeFiles/INSTALL.dir
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/external/glbinding-2.1.1/source/glbinding/CMakeFiles/glbinding.dir
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/external/glbinding-2.1.1/source/glbinding/CMakeFiles/INSTALL.dir

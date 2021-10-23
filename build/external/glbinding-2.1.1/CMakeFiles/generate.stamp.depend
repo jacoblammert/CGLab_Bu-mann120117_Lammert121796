@@ -1,0 +1,20 @@
+# CMake generation dependency list for this directory.
+C:/Program Files/CMake/share/cmake-3.22/Modules/CMakeCheckCompilerFlagCommonPatterns.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/CMakeCompilerIdDetection.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/CheckCCompilerFlag.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/CheckCSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/CheckCXXCompilerFlag.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/CheckCXXSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/ExternalProject.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/GenerateExportHeader.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/Internal/CheckCompilerFlag.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/Internal/CheckSourceCompiles.cmake
+C:/Program Files/CMake/share/cmake-3.22/Modules/WriteCompilerDetectionHeader.cmake
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/.git/HEAD
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/.git/refs/heads/master
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/build/external/glbinding-2.1.1/CMakeFiles/git-data/grabRef.cmake
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/external/glbinding-2.1.1/CMakeLists.txt
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/external/glbinding-2.1.1/cmake/CompileOptions.cmake
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/external/glbinding-2.1.1/cmake/Custom.cmake
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/external/glbinding-2.1.1/cmake/GetGitRevisionDescription.cmake
+C:/Users/Jacob/CLionProjects/CGLab_Bussmann120117_Lammert121796/external/glbinding-2.1.1/cmake/GetGitRevisionDescription.cmake.in

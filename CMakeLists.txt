@@ -1,6 +1,6 @@
 cmake_minimum_required (VERSION 2.8)
 # allows access to environment variables with the name 
-project (OpenGL_Framework)
+project (OpenGLFramework)
 
 #set the build type if its not set
 if(NOT CMAKE_BUILD_TYPE)

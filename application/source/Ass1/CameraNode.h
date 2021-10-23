@@ -12,13 +12,16 @@ class CameraNode : Node{
 public:
     bool getPerspective();
     bool getEnabled();
-    bool setEnabled(bool enabled);
+
     glm::fmat4 getProjectionMatrix();
+
+    void setEnabled(bool enabled);
     void setProjectionMatrix(glm::fmat4 projectionmatrix);
 
 private:
     bool isPerspective;
     bool isEnabled;
+
     glm::fmat4 projectionMatrix;
 
 };

@@ -12,8 +12,8 @@ bool CameraNode::getEnabled() {
     return isEnabled;
 }
 
-bool CameraNode::setEnabled(bool enabled) {
-    return isEnabled;
+void CameraNode::setEnabled(bool enabled) {
+    isEnabled = enabled;
 }
 
 glm::fmat4 CameraNode::getProjectionMatrix() {

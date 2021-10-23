@@ -3,7 +3,9 @@
 //
 
 #include "SceneGraph.h"
-#include <Node.h>
+#include "Node.h"
+
+#include <utility>
 
 SceneGraph::SceneGraph(){}
 
@@ -12,7 +14,7 @@ std::string SceneGraph::getName(){
 }
 
 void SceneGraph::setName(std::string name){
-    this->name = name;
+    this->name = std::move(name);
 }
 
 void SceneGraph::setRoot(Node* root){

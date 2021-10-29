@@ -4,16 +4,17 @@
 
 #include "Node.h"
 #include <string>
+#include <utility>
 
 Node::Node() {
 
 }
 
-Node *Node::getParent() {
+std::shared_ptr<Node> Node::getParent() {
     return parent;
 }
 
-Node *Node::getChildren(std::string name) {
+std::shared_ptr<Node> Node::getChildren(std::string name) {
 
     for (int i = 0; i < children.size(); ++i){
         if (children[i]->getName() == name){
@@ -24,9 +25,9 @@ Node *Node::getChildren(std::string name) {
     return nullptr;
 }
 
-Node *Node::removeChildren(std::string name) {
+std::shared_ptr<Node> Node::removeChildren(std::string name) {
 
-    Node* child = nullptr;
+    std::shared_ptr<Node> child = nullptr;
 
     for (int i = 0; i < children.size(); ++i){
         if (children[i]->getName() == name){
@@ -39,23 +40,23 @@ Node *Node::removeChildren(std::string name) {
     return child;
 }
 
-std::vector<Node *> Node::getChildrenList() {
+std::vector<std::shared_ptr<Node>> Node::getChildrenList() {
     return children;
 }
 
-void Node::setParent(Node *parenta) {
-    this->parent = parenta;
+void Node::setParent(std::shared_ptr<Node> parenta) {
+    this->parent = std::move(parenta);
 }
 
-void Node::setLocalTransform(glm::fmat4 localtransform) {
-    this->localTransform = localtransform;
+void Node::setLocalTransform(const glm::fmat4& localtransform) {
+    localTransform = localtransform;
 }
 
-void Node::setWorldTransform(glm::fmat4 worldtransform) {
+void Node::setWorldTransform(const glm::fmat4& worldtransform) {
     worldTransform = worldtransform;
 }
 
-void Node::addChildren(Node *child) {
+void Node::addChildren(std::shared_ptr<Node> child) {
     children.push_back(child);
 }
 
@@ -64,7 +65,10 @@ glm::fmat4 Node::getLocalTransform() {
 }
 
 glm::fmat4 Node::getWorldTransform() {
-    return worldTransform;
+    if (parent != nullptr){
+        return parent->getWorldTransform();
+    }
+    return localTransform;
 }
 
 std::string Node::getName() {

@@ -15,13 +15,13 @@ public:
     SceneGraph();
 
     std::string getName();
-    Node* getRoot();
+    std::shared_ptr<Node> getRoot();
 
 private:
     std::string name = "";
-    Node* root;
+    std::shared_ptr<Node> root;
     void setName(std::string name);
-    void setRoot(Node* root);
+    void setRoot(std::shared_ptr<Node> root);
 
 };
 

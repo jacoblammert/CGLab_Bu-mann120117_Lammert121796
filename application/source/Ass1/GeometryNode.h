@@ -9,11 +9,11 @@
 #include <structs.hpp>
 #include "Node.h"
 
-class GeometryNode : Node{
+class GeometryNode : public Node{
 
 public:
     model_object getGeometry();
-    void getGeometry(model_object model);
+    void setGeometry(model_object model);
 
 private:
     model_object geometry;

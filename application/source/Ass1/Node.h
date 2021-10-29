@@ -8,6 +8,8 @@
 #include <string>
 #include <vector>
 #include <glm/detail/type_mat4x4.hpp>
+#include <memory>
+
 
 
 class Node {
@@ -15,16 +17,16 @@ class Node {
 public:
     Node();
 
-    Node* getParent();
-    Node* getChildren(std::string name);
-    Node* removeChildren(std::string name);
+    std::shared_ptr<Node> getParent();
+    std::shared_ptr<Node> getChildren(std::string name);
+    std::shared_ptr<Node> removeChildren(std::string name);
 
-    std::vector<Node*> getChildrenList();
+    std::vector<std::shared_ptr<Node>> getChildrenList();
 
-    void setParent(Node* parent);
-    void setLocalTransform(glm::fmat4 localtransform);
-    void setWorldTransform(glm::fmat4 worldtransform);
-    void addChildren(Node* child);
+    void setParent(std::shared_ptr<Node> parent);
+    void setLocalTransform(const glm::fmat4& localtransform);
+    void setWorldTransform(const glm::fmat4& worldtransform);
+    void addChildren(std::shared_ptr<Node> child);
 
     glm::fmat4 getLocalTransform();
     glm::fmat4 getWorldTransform();
@@ -37,13 +39,13 @@ public:
 
 
 private:
-    Node *parent;
-    std::vector<Node*> children;
+    std::shared_ptr<Node> parent;
+    std::vector<std::shared_ptr<Node>> children;
     std::string name;
     std::string path;
     int depth;
-    glm::fmat4 localTransform;
-    glm::fmat4 worldTransform;
+    glm::fmat4 localTransform = glm::fmat4(1.0);
+    glm::fmat4 worldTransform = glm::fmat4(1.0);
 
 
 };

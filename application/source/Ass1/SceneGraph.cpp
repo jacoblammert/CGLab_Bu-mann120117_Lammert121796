@@ -17,10 +17,10 @@ void SceneGraph::setName(std::string name){
     this->name = std::move(name);
 }
 
-void SceneGraph::setRoot(Node* root){
+void SceneGraph::setRoot(std::shared_ptr<Node> root){
     this->root = root;
 }
 
-Node* SceneGraph::getRoot(){
+std::shared_ptr<Node> SceneGraph::getRoot(){
     return root;
 }

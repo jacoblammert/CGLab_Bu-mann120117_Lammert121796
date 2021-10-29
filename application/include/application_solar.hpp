@@ -4,6 +4,7 @@
 #include "application.hpp"
 #include "model.hpp"
 #include "structs.hpp"
+#include "../source/Ass1/Node.h"
 
 // gpu representation of model
 class ApplicationSolar : public Application {
@@ -40,6 +41,10 @@ class ApplicationSolar : public Application {
   glm::fmat4 m_view_transform;
   // camera projection matrix
   glm::fmat4 m_view_projection;
+  // root Node (contains camera)
+
+    std::shared_ptr<Node> root = nullptr;
+
 };
 
 #endif

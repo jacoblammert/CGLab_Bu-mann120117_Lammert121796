@@ -38,31 +38,63 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
     std::shared_ptr<CameraNode> camera = std::make_shared<CameraNode>(CameraNode());
 
 
+
+    std::shared_ptr<GeometryNode> moon = std::make_shared<GeometryNode>(GeometryNode());
     std::shared_ptr<GeometryNode> planet_1 = std::make_shared<GeometryNode>(GeometryNode());
-    std::shared_ptr<Node> planet_node_1 = std::make_shared<Node>(Node());
+    std::shared_ptr<GeometryNode> planet_2 = std::make_shared<GeometryNode>(GeometryNode());
+    std::shared_ptr<GeometryNode> planet_3 = std::make_shared<GeometryNode>(GeometryNode());
+    std::shared_ptr<GeometryNode> planet_4 = std::make_shared<GeometryNode>(GeometryNode());
+    std::shared_ptr<GeometryNode> planet_5 = std::make_shared<GeometryNode>(GeometryNode());
+    std::shared_ptr<GeometryNode> planet_6 = std::make_shared<GeometryNode>(GeometryNode());
+    std::shared_ptr<GeometryNode> planet_7 = std::make_shared<GeometryNode>(GeometryNode());
+    std::shared_ptr<GeometryNode> planet_8 = std::make_shared<GeometryNode>(GeometryNode());
 
 
     std::shared_ptr<Node> moon_node = std::make_shared<Node>(Node());
-    std::shared_ptr<GeometryNode> moon = std::make_shared<GeometryNode>(GeometryNode());
+    std::shared_ptr<Node> planet_node_1 = std::make_shared<Node>(Node());
+    std::shared_ptr<Node> planet_node_2 = std::make_shared<Node>(Node());
+    std::shared_ptr<Node> planet_node_3 = std::make_shared<Node>(Node());
+    std::shared_ptr<Node> planet_node_4 = std::make_shared<Node>(Node());
+    std::shared_ptr<Node> planet_node_5 = std::make_shared<Node>(Node());
+    std::shared_ptr<Node> planet_node_6 = std::make_shared<Node>(Node());
+    std::shared_ptr<Node> planet_node_7 = std::make_shared<Node>(Node());
+    std::shared_ptr<Node> planet_node_8 = std::make_shared<Node>(Node());
+
+
+
 
     moon_node->addChildren(moon);
-
-    //planet_node_1->addChildren(moon_node);
+    planet_node_1->addChildren(moon_node);
     planet_node_1->addChildren(planet_1);
+    planet_node_2->addChildren(planet_2);
+    planet_node_3->addChildren(planet_3);
+    planet_node_4->addChildren(planet_4);
+    planet_node_5->addChildren(planet_5);
+    planet_node_6->addChildren(planet_6);
+    planet_node_7->addChildren(planet_7);
+    planet_node_8->addChildren(planet_8);
 
-    planet_1->setLocalTransform(glm::fmat4(1,0,0,1,
+
+    planet_1->setLocalTransform(glm::fmat4(3,0,0,0,
                                            0,1,0,0,
                                            0,0,1,0,
                                            0,0,0,1));
 
 
-    moon->setLocalTransform(glm::fmat4(1,0,0,1,
-                                           0,1,0,1,
-                                           0,0,1,1,
+    moon->setLocalTransform(glm::fmat4(1,0,0,0,
+                                           0,1,0,0,
+                                           0,0,1,0,
                                            0,0,0,1));
 
 
     root->addChildren(planet_node_1);
+    root->addChildren(planet_node_2);
+    root->addChildren(planet_node_3);
+    root->addChildren(planet_node_4);
+    root->addChildren(planet_node_5);
+    root->addChildren(planet_node_6);
+    root->addChildren(planet_node_7);
+    root->addChildren(planet_node_8);
 
 
 }
@@ -87,15 +119,12 @@ void ApplicationSolar::render() const {
 
 
     int i = 0;
-    while (i < nodes.size()) {
+    int size_nodes = nodes.size();
+    while (i < size_nodes) {
 
         std::cout<<nodes.size()<<"\n";
 
-        //std::cout << typeid(nodes[i]).name() << "\n";
-
         if (typeid(nodes[i]) == typeid(std::shared_ptr<Node>)) {
-            //std::vector<Node*> =
-            //std::vector<Node *> children = nodes[i]->getChildrenList();
 
             std::cout << "Children: " << nodes[i]->getChildrenList().size() << "\n";
 
@@ -116,6 +145,10 @@ void ApplicationSolar::render() const {
                         planets.push_back(mDerived);
                         //std::cout << "add to list\n";
                         //continue;
+                    }else{
+                        std::cout<<"Node is no geometry\n";
+                        nodes.push_back(node);
+                        size_nodes++;
                     }
                 } catch (const std::invalid_argument &e) {
 
@@ -165,11 +198,11 @@ void ApplicationSolar::render() const {
         glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
                            1, GL_FALSE, glm::value_ptr(normal_matrix));
 
-        std::cout << "Geometry\n" << planets[i]->getGeometry().element_BO;
+        //std::cout << "Geometry\n" << planets[i]->getGeometry().element_BO;
         // bind the VAO to draw
         glBindVertexArray(planets[i]->getGeometry().vertex_AO);
 
-        std::cout << "Geometry2\n";
+        //std::cout << "Geometry2\n";
         // draw bound vertex array using bound shader
         glDrawElements(planets[i]->getGeometry().draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
     }

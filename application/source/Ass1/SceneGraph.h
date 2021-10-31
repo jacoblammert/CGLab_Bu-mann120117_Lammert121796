@@ -24,8 +24,8 @@ private:
 
     //static SceneGraph* sceneGraph;
 
-    std::string name = "";
-    std::shared_ptr<Node> root = nullptr;
+    std::string name_ = "";
+    std::shared_ptr<Node> root_ = nullptr;
     void setName(std::string name);
     void setRoot(std::shared_ptr<Node> root);
 

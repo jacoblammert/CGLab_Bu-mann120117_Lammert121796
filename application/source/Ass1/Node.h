@@ -40,13 +40,13 @@ public:
 
 
 private:
-    std::shared_ptr<Node> parent;
-    std::vector<std::shared_ptr<Node>> children;
-    std::string name;
-    std::string path;
-    int depth = 1;
-    glm::fmat4 localTransform = glm::fmat4(1.0);
-    glm::fmat4 worldTransform = glm::fmat4(1.0);
+    std::shared_ptr<Node> parent_;
+    std::vector<std::shared_ptr<Node>> children_;
+    std::string name_;
+    std::string path_;
+    int depth_ = 1;
+    glm::fmat4 localTransform_ = glm::fmat4(1.0);
+    glm::fmat4 worldTransform_ = glm::fmat4(1.0);
 
 
 };

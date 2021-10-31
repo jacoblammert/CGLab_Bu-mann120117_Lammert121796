@@ -16,7 +16,7 @@ public:
     void setGeometry(model_object model);
 
 private:
-    model_object geometry;
+    model_object geometry_;
 
 };
 

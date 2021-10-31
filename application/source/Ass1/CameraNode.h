@@ -19,10 +19,10 @@ public:
     void setProjectionMatrix(glm::fmat4 projectionmatrix);
 
 private:
-    bool isPerspective;
-    bool isEnabled;
+    bool isPerspective_;
+    bool isEnabled_;
 
-    glm::fmat4 projectionMatrix;
+    glm::fmat4 projectionMatrix_;
 
 };
 

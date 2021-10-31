@@ -114,15 +114,15 @@ void Node::addChildren(std::shared_ptr<Node> child) {
  * @return new transformation with rotated planet
  */
 glm::fmat4 Node::getLocalTransform() {
-    glm::fmat4 model_matrix;
-    // rotation
+    glm::fmat4 model_matrix = glm::fmat4{1.0};
+    // rotation around the center (sun)
     model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() * (name_.length() + 1)), glm::fvec3{0.0f, 1.0f, 0.0f});
 
     // translation
     model_matrix = glm::translate(model_matrix,
                                   glm::vec3(localTransform_[0][3], localTransform_[1][3], localTransform_[2][3]));
 
-    // rotation
+    // rotation around its axis
     model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * (name_.length() + 1)), glm::fvec3{0.0f, 1.0f, 0.0f});
 
     // Scaling
@@ -130,10 +130,10 @@ glm::fmat4 Node::getLocalTransform() {
                                              localTransform_[1][0], localTransform_[1][1], localTransform_[1][2], 0,
                                              localTransform_[2][0], localTransform_[2][1], localTransform_[2][2], 0,
                                              0, 0, 0, 1);
-
-    // 1. rotate planet (own axis)
+    // 1. rotate planet (around sun)
     // 2. translate planet (local transform)
     // 3. world transform
+    // 4. rotate planet (own axis)
     return model_matrix;
 }
 

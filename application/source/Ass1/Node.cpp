@@ -18,31 +18,18 @@ std::shared_ptr<Node> Node::getParent() {
 }
 
 std::shared_ptr<Node> Node::getChildren(std::string name) {
-    std::cout << getDepth() << " " << getName() << "\n";
-
-
     for (int i = 0; i < children.size(); ++i) {
-        std::cout << name << " " << children[i]->getName() << "\n";
         if (children[i]->getName() == name) {
             return children[i];
         }
     }
-
-
     std::shared_ptr<Node> found;
-
     for (int i = 0; i < children.size(); ++i) {
-
-
         found = children[i]->getChildren(name);
         if (found != nullptr) {
             return found;
         }
-
-
     }
-
-
     return nullptr;
 }
 
@@ -99,6 +86,9 @@ glm::fmat4 Node::getLocalTransform() {
                                              localTransform[2][0], localTransform[2][1], localTransform[2][2], 0,
                                              0, 0, 0, 1);
 
+    // 1. rotate planet (own axis)
+    // 2. translate planet (local transform)
+    // 3. world transform
     return model_matrix;
 }
 

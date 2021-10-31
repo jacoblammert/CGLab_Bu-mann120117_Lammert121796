@@ -8,7 +8,7 @@
 #include <utility>
 
 SceneGraph::SceneGraph(){
-    setRoot(std::make_shared<Node>());
+    setRoot(std::make_shared<Node>(Node()));
 }
 
 std::string SceneGraph::getName(){

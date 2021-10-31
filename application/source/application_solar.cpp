@@ -32,9 +32,12 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
     initializeGeometry();
     initializeShaderPrograms();
 
-    //sceneGraph = SceneGraph(); // TODO make singleton
+    //sceneGraph = SceneGraph();
+    //TODO PointLightNode "test"
+    //TODO singleton in SceneGraph
 
-    root = std::make_shared<Node>(Node());//sceneGraph.getRoot();
+    //std::shared_ptr<Node> root = sceneGraph.getRoot(); // //
+    root = std::make_shared<Node>(Node());
 
     std::cout<<"Hallo\n";
 
@@ -75,20 +78,20 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
                                                   0, 0, scale, z,
                                                   0, 0, 0, 1));
     }
-    //TODO add moon to root. get ("earth").addCchild
 
 
-    std::cout<<"Hallo\n";
+
+
 
 
     std::shared_ptr<Node> moon = std::make_shared<GeometryNode>(GeometryNode());
     std::shared_ptr<Node> moon_node = std::make_shared<Node>(Node());
 
-    std::cout<<"Hallo1\n";
+
     std::cout<<root->getPath()<<"\n";
     std::shared_ptr<Node> earth_node = root->getChildren("Earth");
     earth_node = earth_node->getParent();
-    std::cout<<"Hallo2\n";
+
 
 
     earth_node->addChildren(moon_node);
@@ -99,9 +102,8 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
 
 
     moon->setName("Moon");
-    earth_node->setName("Planet 1");
 
-    /*/earth_node->setLocalTransform(glm::fmat4(1, 0, 0, 10,
+    /**/earth_node->setLocalTransform(glm::fmat4(1, 0, 0, 10,
                                                 0, 1, 0, 0,
                                                 0, 0, 1, 0,
                                                 0, 0, 0, 1));
@@ -128,12 +130,6 @@ void ApplicationSolar::render() const {
     // bind shader to upload uniforms
     glUseProgram(m_shaders.at("planet").handle);
 
-
-    //glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()), glm::fvec3{0.0f, 1.0f, 0.0f});
-    //model_matrix = glm::translate(model_matrix, glm::fvec3{0.0f, 0.0f, -1.0f});
-
-    // root node get
-
     //std::shared_ptr<Node> root = sceneGraph.getRoot();
 
     std::vector<std::shared_ptr<Node>> nodes = root->getChildrenList();
@@ -152,9 +148,6 @@ void ApplicationSolar::render() const {
             planets[planets.size() - 1]->setGeometry(planet_object);
         }
 
-        //TODO PointLightNode "test"
-        //TODO singleton in SceneGraph
-
         i++;
     } while (i < nodes.size());
 
@@ -162,41 +155,8 @@ void ApplicationSolar::render() const {
     for (int i = 0; i < planets.size(); ++i) {
 
 
-        // 1. rotate planet (own axis)
-        // 2. translate planet (local transform)
-        // 3. world transform
 
-        glm::fmat4 model_matrix = planets[i]->getWorldTransform();// * planets[i]->getLocalTransform();
-
-
-        //planets[i]->setWorldTransform(model_matrix):
-
-        ////model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()), glm::fvec3{0.0f, 1.0f, 0.0f});
-        ////model_matrix = glm::translate(model_matrix, glm::vec3(planets[i]->getLocalTransform()[0][3],planets[i]->getLocalTransform()[1][3],planets[i]->getLocalTransform()[2][3]));
-
-        //planets[i]->setLocalTransform(model_matrix/* * planets[i]->getLocalTransform()*/);
-
-        //model_matrix = planets[i]->getLocalTransform();
-
-        ///glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()) * (1 + i), glm::fvec3{0.0f, 1.0f, 0.0f});
-        //model_matrix = glm::translate(model_matrix, glm::fvec3{0.0f, 0.0f, -1.0f});
-
-        ///glm::vec3 pos = glm::vec3(planets[i]->getLocalTransform()[0][3],planets[i]->getLocalTransform()[1][3],planets[i]->getLocalTransform()[2][3]);
-
-        //std::cout<<pos.x<<" "<<pos.y<<" "<<pos.z<<"\n";
-
-        ///model_matrix = glm::translate(model_matrix, pos);
-
-        //glm::fmat4 rotation = glm::rotate(glm::fmat4 {}, float(glfwGetTime()), glm::fvec3{0.0f, 1.0f, 0.0f})
-        //        * planets[i]->getLocalTransform();
-
-        ///model_matrix = model_matrix * planets[i]->getLocalTransform();
-
-
-        //model_matrix = planets[i]->getWorldTransform();
-        ///planets[i]->setWorldTransform(model_matrix);
-
-
+        glm::fmat4 model_matrix = planets[i]->getWorldTransform();
 
 
         glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),

@@ -7,7 +7,9 @@
 
 #include <utility>
 
-SceneGraph::SceneGraph(){}
+SceneGraph::SceneGraph(){
+    setRoot(std::make_shared<Node>());
+}
 
 std::string SceneGraph::getName(){
     return name;
@@ -21,6 +23,10 @@ void SceneGraph::setRoot(std::shared_ptr<Node> root){
     this->root = root;
 }
 
-std::shared_ptr<Node> SceneGraph::getRoot(){
+std::shared_ptr<Node> SceneGraph::getRoot() const {
     return root;
+}
+
+std::string SceneGraph::printGraph() {
+    return root->getPath();
 }

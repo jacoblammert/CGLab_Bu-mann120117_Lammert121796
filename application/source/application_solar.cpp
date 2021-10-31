@@ -31,17 +31,21 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
 
     initializeGeometry();
     initializeShaderPrograms();
-    //TODO add scene graph object
-    root = std::make_shared<Node>(Node());
 
+    //sceneGraph = SceneGraph(); // TODO make singleton
+
+    root = std::make_shared<Node>(Node());//sceneGraph.getRoot();
+
+    std::cout<<"Hallo\n";
 
     std::shared_ptr<CameraNode> camera = std::make_shared<CameraNode>(CameraNode());
 
-    std::vector<std::string> names = {"earth", "mars hmmm lecker", "saturn", "mediamarkt", "fuenf", "Sonne","X"};
+    std::vector<std::string> names = {"Sun","Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus","Neptune","Pluto"};
 
-    std::vector<int> position = {10, 5, 2, 6, 4, 20,8};
+    std::vector<int> position = {10, -5, -2, 6, -4, 20, 8,-1,2,4,-3};
 
-    for (int i = 0; i < 7; ++i) {
+    std::cout<<"Hallo\n";
+    for (int i = 0; i < names.size(); ++i) {
 
         std::shared_ptr<GeometryNode> planet = std::make_shared<GeometryNode>(GeometryNode());
         std::shared_ptr<Node> planet_node = std::make_shared<Node>(Node());
@@ -52,47 +56,66 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
         planet_node->setParent(root);
 
 
-        planet->setLocalTransform(glm::fmat4(1,0,0,position[i*i%position.size()],
-                                               0,1,0,3*i%position.size(),
-                                               0,0,1,7*i%position.size(),
-                                               0,0,0,1));
+
+        //sqrt(pow(position[i * i % position.size()],2) * pow(7 * i % position.size(),2))
+        // sqrt(pow(3 * i % position.size(),2) * pow((7 * i % position.size()),2))
+
+        float x = position[(i*(i+1)) % position.size()];
+        float z = position[i % position.size()];
+        float scale = 1;
+
+        if (i == 0){
+            x = 0;
+            z = 0;
+            scale = 2;
+        }
+
+        planet_node->setLocalTransform(glm::fmat4(scale, 0, 0, x,
+                                                  0, scale, 0, 0,
+                                                  0, 0, scale, z,
+                                                  0, 0, 0, 1));
     }
     //TODO add moon to root. get ("earth").addCchild
 
-    std::shared_ptr<GeometryNode> moon = std::make_shared<GeometryNode>(GeometryNode());
-    std::shared_ptr<GeometryNode> planet_1 = std::make_shared<GeometryNode>(GeometryNode());
+
+    std::cout<<"Hallo\n";
 
 
+    std::shared_ptr<Node> moon = std::make_shared<GeometryNode>(GeometryNode());
     std::shared_ptr<Node> moon_node = std::make_shared<Node>(Node());
-    std::shared_ptr<Node> planet_node_1 = std::make_shared<Node>(Node());
+
+    std::cout<<"Hallo1\n";
+    std::cout<<root->getPath()<<"\n";
+    std::shared_ptr<Node> earth_node = root->getChildren("Earth");
+    earth_node = earth_node->getParent();
+    std::cout<<"Hallo2\n";
 
 
-    planet_1->setLocalTransform(glm::fmat4(1,0,0,10,
-                                           0,1,0,0,
-                                           0,0,1,0,
-                                           0,0,0,1));
+    earth_node->addChildren(moon_node);
+    moon_node->setParent(earth_node);
+    moon_node->addChildren(moon);
+    moon->setParent(moon_node);
 
 
-    moon->setLocalTransform(glm::fmat4(0.1f,0,0,1,
-                                       0,0.1f,0,0,
-                                       0,0,0.1f,0,
-                                       0,0,0,1));
 
     moon->setName("Moon");
-    planet_1->setName("Planet 1");
+    earth_node->setName("Planet 1");
+
+    /*/earth_node->setLocalTransform(glm::fmat4(1, 0, 0, 10,
+                                                0, 1, 0, 0,
+                                                0, 0, 1, 0,
+                                                0, 0, 0, 1));
+/**/
+
+    moon_node->setLocalTransform(glm::fmat4(0.1f, 0, 0, 3,
+                                            0, 0.1f, 0, 0,
+                                            0, 0, 0.1f, 0,
+                                            0, 0, 0, 1));
 
 
-    moon_node->addChildren(moon);
-    planet_node_1->addChildren(moon_node);
-    planet_node_1->addChildren(planet_1);
 
+    std::cout << root->getPath() << "\n";
 
-
-
-    root->addChildren(planet_node_1);
-
-    std::cout<<root->getPath()<<"\n";
-    //exit(0);
 }
 
 ApplicationSolar::~ApplicationSolar() {
@@ -111,34 +134,30 @@ void ApplicationSolar::render() const {
 
     // root node get
 
+    //std::shared_ptr<Node> root = sceneGraph.getRoot();
+
     std::vector<std::shared_ptr<Node>> nodes = root->getChildrenList();
     std::vector<std::shared_ptr<GeometryNode>> planets = std::vector<std::shared_ptr<GeometryNode>>{};
 
 
     int i = 0;
-    int size_nodes = nodes.size();
-    do{
+
+    do {
         for (auto &&node : nodes[i]->getChildrenList()) {
             nodes.push_back(node);
         }
-        if(!nodes[i]->getName().empty()){
-            planets.push_back( std::static_pointer_cast<GeometryNode, Node>(nodes[i]));
+        if (!nodes[i]->getName().empty()) {
+            planets.push_back(std::static_pointer_cast<GeometryNode, Node>(nodes[i]));
             // since we need to cast the node (we return a node object), we loose the geometry data
-            planets[planets.size()-1]->setGeometry(planet_object);
+            planets[planets.size() - 1]->setGeometry(planet_object);
         }
 
-                //TODO PointLightNode "test"
-                //TODO singleton in SceneGraph
+        //TODO PointLightNode "test"
+        //TODO singleton in SceneGraph
 
         i++;
-    }while (i < nodes.size());
+    } while (i < nodes.size());
 
-
-    std::cout<<planets.size()<<"\n";
-
-
-
-    std::cout << "planets size: " << planets.size() << "\n";
 
     for (int i = 0; i < planets.size(); ++i) {
 
@@ -147,7 +166,10 @@ void ApplicationSolar::render() const {
         // 2. translate planet (local transform)
         // 3. world transform
 
-        glm::fmat4 model_matrix = planets[i]->getLocalTransform();
+        glm::fmat4 model_matrix = planets[i]->getWorldTransform();// * planets[i]->getLocalTransform();
+
+
+        //planets[i]->setWorldTransform(model_matrix):
 
         ////model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()), glm::fvec3{0.0f, 1.0f, 0.0f});
         ////model_matrix = glm::translate(model_matrix, glm::vec3(planets[i]->getLocalTransform()[0][3],planets[i]->getLocalTransform()[1][3],planets[i]->getLocalTransform()[2][3]));
@@ -294,11 +316,9 @@ void ApplicationSolar::keyCallback(int key, int action, int mods) {
 //handle delta mouse movement input
 void ApplicationSolar::mouseCallback(double pos_x, double pos_y) {
     // mouse handling
-    // rotates around the origin, first remove x y z, then rotate, add x,y,z
-    // glm::fmat4 model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()), glm::fvec3{0.0f, 1.0f, 0.0f});
-    //m_view_transform = glm::rotate(m_view_transform,float(pos_x), glm::fvec3{0, 1.0f, 0});
-    //m_view_transform = glm::rotate(m_view_transform,float(pos_y), glm::fvec3{1, 0, 0});
-
+    m_view_transform = glm::rotate(m_view_transform, glm::radians(-(float) pos_x / 60), glm::vec3{0.0f, 1.0f, 0.0f});
+    m_view_transform = glm::rotate(m_view_transform, glm::radians(-(float) pos_y / 60), glm::vec3{1.0f, 0.0f, 0.0f});
+    uploadView();
 }
 
 //handle resizing

@@ -16,16 +16,16 @@ public:
     ~SceneGraph();
 
     std::string getName();
-    std::shared_ptr<Node> getRoot();
+    std::shared_ptr<Node> getRoot() const;
 
     std::string printGraph();
 
 private:
 
-    static SceneGraph* sceneGraph;
+    //static SceneGraph* sceneGraph;
 
     std::string name = "";
-    std::shared_ptr<Node> root;
+    std::shared_ptr<Node> root = nullptr;
     void setName(std::string name);
     void setRoot(std::shared_ptr<Node> root);
 

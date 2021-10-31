@@ -5,6 +5,7 @@
 #include "model.hpp"
 #include "structs.hpp"
 #include "../source/Ass1/Node.h"
+#include "../source/Ass1/SceneGraph.h"
 
 // gpu representation of model
 class ApplicationSolar : public Application {
@@ -23,6 +24,10 @@ class ApplicationSolar : public Application {
 
   // draw all objects
   void render() const;
+
+  //SceneGraph sceneGraph = SceneGraph();
+
+  std::shared_ptr<Node> root;
 
  protected:
   void initializeShaderPrograms();
@@ -43,7 +48,6 @@ class ApplicationSolar : public Application {
   glm::fmat4 m_view_projection;
   // root Node (contains camera)
 
-    std::shared_ptr<Node> root = nullptr;
 
 };
 

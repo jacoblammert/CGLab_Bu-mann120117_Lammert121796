@@ -39,15 +39,14 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
     //std::shared_ptr<Node> root = sceneGraph.getRoot(); // //
     root = std::make_shared<Node>(Node());
 
-    std::cout<<"Hallo\n";
 
-    std::shared_ptr<CameraNode> camera = std::make_shared<CameraNode>(CameraNode());
+
+    std::shared_ptr<CameraNode> camera = std::make_shared<CameraNode>(CameraNode()); // add to scenecgraph
 
     std::vector<std::string> names = {"Sun","Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus","Neptune","Pluto"};
 
     std::vector<int> position = {10, -5, -2, 6, -4, 20, 8,-1,2,4,-3};
 
-    std::cout<<"Hallo\n";
     for (int i = 0; i < names.size(); ++i) {
 
         std::shared_ptr<GeometryNode> planet = std::make_shared<GeometryNode>(GeometryNode());
@@ -88,7 +87,6 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
     std::shared_ptr<Node> moon_node = std::make_shared<Node>(Node());
 
 
-    std::cout<<root->getPath()<<"\n";
     std::shared_ptr<Node> earth_node = root->getChildren("Earth");
     earth_node = earth_node->getParent();
 

@@ -17,7 +17,6 @@ public:
 
 private:
     model_object geometry;
-    //TODO check if model_object class is the right one
 
 };
 

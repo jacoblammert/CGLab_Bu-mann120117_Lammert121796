@@ -23,6 +23,7 @@ public:
 
     std::vector<std::shared_ptr<Node>> getChildrenList();
 
+    void setName(std::string name);
     void setParent(std::shared_ptr<Node> parent);
     void setLocalTransform(const glm::fmat4& localtransform);
     void setWorldTransform(const glm::fmat4& worldtransform);
@@ -43,7 +44,7 @@ private:
     std::vector<std::shared_ptr<Node>> children;
     std::string name;
     std::string path;
-    int depth;
+    int depth = 1;
     glm::fmat4 localTransform = glm::fmat4(1.0);
     glm::fmat4 worldTransform = glm::fmat4(1.0);
 

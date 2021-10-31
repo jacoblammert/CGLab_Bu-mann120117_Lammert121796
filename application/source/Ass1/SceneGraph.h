@@ -13,11 +13,17 @@
 class SceneGraph {
 public:
     SceneGraph();
+    ~SceneGraph();
 
     std::string getName();
     std::shared_ptr<Node> getRoot();
 
+    std::string printGraph();
+
 private:
+
+    static SceneGraph* sceneGraph;
+
     std::string name = "";
     std::shared_ptr<Node> root;
     void setName(std::string name);

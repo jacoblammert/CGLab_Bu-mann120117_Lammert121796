@@ -5,6 +5,9 @@
 #include "Node.h"
 #include <string>
 #include <utility>
+#include <iostream>
+#include <glm/gtc/matrix_transform.hpp>
+#include <GLFW/glfw3.h>
 
 Node::Node() {
 
@@ -61,12 +64,19 @@ void Node::addChildren(std::shared_ptr<Node> child) {
 }
 
 glm::fmat4 Node::getLocalTransform() {
-    return localTransform;
+    glm::fmat4 model_matrix;
+    model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime()), glm::fvec3{0.0f, 1.0f, 0.0f});
+    model_matrix = glm::translate(model_matrix, glm::vec3(localTransform[0][3],localTransform[1][3],localTransform[2][3]));
+
+
+    model_matrix = glm::rotate(model_matrix, float(glfwGetTime()), glm::fvec3{0.0f, 1.0f, 0.0f});
+    return model_matrix;
 }
 
 glm::fmat4 Node::getWorldTransform() {
+    //return worldTransform;
     if (parent != nullptr){
-        return parent->getWorldTransform();
+        return parent->getWorldTransform() * localTransform;
     }
     return localTransform;
 }
@@ -76,9 +86,57 @@ std::string Node::getName() {
 }
 
 std::string Node::getPath() {
-    return path;
+    std::string path_ = "";
+    if (getDepth() == 1){
+        path_ = "root ";
+    }else if (name.empty()){
+        path_ += "[ " + std::to_string(getDepth()) + " ]";
+    } else{
+        path_ = name;
+    }
+
+    if (children.empty()) {
+        return path_;
+    }
+
+    path_ = path_ + " -> (";
+
+    for (int i = 0; i < children.size(); ++i) {
+
+        path_ += children[i]->getPath();
+        if (i < children.size()-1){
+            path_ += ",";
+        }
+    }
+    path_ = path_ + ")";
+
+    return path_;
+
+    /*/
+    std::string path_ = "";
+    if (parent != nullptr) {
+        if (!name.empty()) {
+            path = parent->getPath() + " -> " + name;
+        }else{
+            path = parent->getPath() + " -> [ ]";
+        }
+    }
+
+    path_ = "Path: ";
+    if (!name.empty()){
+        return path_ + " " + name;
+    } else{
+        return path_ + " [ ]";
+    }/**/
 }
 
 int Node::getDepth() {
+    if (parent != nullptr){
+        return parent->getDepth() + depth;
+    }
     return depth;
+}
+
+void Node::setName(std::string name) {
+    this->name = name;
 }

@@ -6,6 +6,7 @@
 #include "model_loader.hpp"
 #include "Ass1/GeometryNode.h"
 #include "Ass1/CameraNode.h"
+#include "Ass1/SceneGraph.h"
 
 #include <glbinding/gl/gl.h>
 // use gl definitions from glbinding 
@@ -32,12 +33,9 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
     initializeGeometry();
     initializeShaderPrograms();
 
-    //sceneGraph = SceneGraph();
-    //TODO PointLightNode "test"
-    //TODO singleton in SceneGraph
 
-    //std::shared_ptr<Node> root = sceneGraph.getRoot(); // //
-    root = std::make_shared<Node>(Node());
+    sceneGraph_ = new SceneGraph(); // we initialize the scingelton object with our root node
+    std::shared_ptr<Node> root = sceneGraph_->getRoot(); // we get the root node
 
 
 
@@ -59,8 +57,6 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
 
 
 
-        //sqrt(pow(position[i * i % position.size()],2) * pow(7 * i % position.size(),2))
-        // sqrt(pow(3 * i % position.size(),2) * pow((7 * i % position.size()),2))
 
         float x = position[(i*(i+1)) % position.size()];
         float z = position[i % position.size()];
@@ -128,7 +124,7 @@ void ApplicationSolar::render() const {
     // bind shader to upload uniforms
     glUseProgram(m_shaders.at("planet").handle);
 
-    //std::shared_ptr<Node> root = sceneGraph.getRoot();
+    std::shared_ptr<Node> root = sceneGraph_->getRoot();
 
     std::vector<std::shared_ptr<Node>> nodes = root->getChildrenList();
     std::vector<std::shared_ptr<GeometryNode>> planets = std::vector<std::shared_ptr<GeometryNode>>{};

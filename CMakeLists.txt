@@ -59,7 +59,7 @@ target_link_libraries(framework glbinding glfw ${GLFW_LIBRARIES})
 include_directories(application/include)
 
 add_executable(solar_system application/source/application_solar.cpp
-        application/source/Ass1/Node.cpp application/source/Ass1/GeometryNode.cpp application/source/Ass1/CameraNode.cpp application/source/Ass1/SceneGraph.cpp)
+        application/source/Ass1/SceneGraph.cpp application/source/Ass1/Node.cpp application/source/Ass1/GeometryNode.cpp application/source/Ass1/CameraNode.cpp )
 
 
 target_link_libraries(solar_system framework)

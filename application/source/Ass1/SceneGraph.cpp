@@ -3,14 +3,13 @@
 //
 
 #include "SceneGraph.h"
-#include "Node.h"
 
 #include <utility>
 
 /**
  * Creates Scene Graph, sets root node
  */
-SceneGraph::SceneGraph(){
+SceneGraph::SceneGraph() {
     setRoot(std::make_shared<Node>(Node()));
 }
 
@@ -18,7 +17,7 @@ SceneGraph::SceneGraph(){
  *
  * @return name of the scene
  */
-std::string SceneGraph::getName(){
+std::string SceneGraph::getName() {
     return name_;
 }
 
@@ -26,7 +25,7 @@ std::string SceneGraph::getName(){
  * sets the name of the scene
  * @param name
  */
-void SceneGraph::setName(std::string name){
+void SceneGraph::setName(std::string name) {
     this->name_ = std::move(name);
 }
 
@@ -34,9 +33,10 @@ void SceneGraph::setName(std::string name){
  * sets the root object of a scene
  * @param root
  */
-void SceneGraph::setRoot(std::shared_ptr<Node> root){
-    this->root_ = root;
+void SceneGraph::setRoot(std::shared_ptr<Node> root) {
+    this->root_ = std::move(root);
 }
+
 /**
  * returns the root object of a scene
  * @return
@@ -52,3 +52,8 @@ std::shared_ptr<Node> SceneGraph::getRoot() const {
 std::string SceneGraph::printGraph() {
     return root_->getPath();
 }
+
+SceneGraph::~SceneGraph() {
+
+}
+

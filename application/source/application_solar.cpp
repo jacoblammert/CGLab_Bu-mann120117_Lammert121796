@@ -228,6 +228,7 @@ void ApplicationSolar::uploadUniforms() {
     // upload uniform values to new locations
     uploadView();
     uploadProjection();
+    
 }
 
 ///////////////////////////// intialisation functions /////////////////////////

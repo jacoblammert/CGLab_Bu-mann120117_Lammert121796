@@ -228,7 +228,7 @@ void ApplicationSolar::uploadUniforms() {
     // upload uniform values to new locations
     uploadView();
     uploadProjection();
-    
+
 }
 
 ///////////////////////////// intialisation functions /////////////////////////
@@ -242,6 +242,7 @@ void ApplicationSolar::initializeShaderPrograms() {
     m_shaders.at("planet").u_locs["ModelMatrix"] = -1;
     m_shaders.at("planet").u_locs["ViewMatrix"] = -1;
     m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
+    
 }
 
 // load models

@@ -25,9 +25,7 @@ class ApplicationSolar : public Application {
   // draw all objects
   void render() const;
 
-  SceneGraph * sceneGraph_;
-
-  //std::shared_ptr<Node> root;
+  SceneGraph * sceneGraph_; // scene graph, contains the scene
 
  protected:
   void initializeShaderPrograms();

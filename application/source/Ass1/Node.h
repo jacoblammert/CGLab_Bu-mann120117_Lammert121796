@@ -38,8 +38,7 @@ public:
     int getDepth();
 
 
-
-private:
+protected:
     std::shared_ptr<Node> parent_;
     std::vector<std::shared_ptr<Node>> children_;
     std::string name_;

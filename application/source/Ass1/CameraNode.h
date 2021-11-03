@@ -8,7 +8,7 @@
 
 #include "Node.h"
 
-class CameraNode : Node{
+class CameraNode : public Node{
 public:
     bool getPerspective();
     bool getEnabled();

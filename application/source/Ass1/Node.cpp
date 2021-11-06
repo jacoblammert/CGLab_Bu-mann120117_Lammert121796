@@ -114,6 +114,23 @@ void Node::addChildren(std::shared_ptr<Node> child) {
  * @return new transformation with rotated planet
  */
 glm::fmat4 Node::getLocalTransform() {
+    return localTransform_;
+}
+
+/**
+ * local transformation in regards to the worldtransformation of the parents
+ * @return
+ */
+glm::fmat4 Node::getWorldTransform() {
+    //return worldTransform;
+    if (parent_ != nullptr) {
+        return parent_->getWorldTransform() * calculateLocalTransform();
+    }
+    return localTransform_;
+}
+
+
+glm::fmat4 Node::calculateLocalTransform() {
     glm::fmat4 model_matrix = glm::fmat4{1.0};
     // rotation around the center (sun)
     model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() * (name_.length() + 1)), glm::fvec3{0.0f, 1.0f, 0.0f});
@@ -137,17 +154,6 @@ glm::fmat4 Node::getLocalTransform() {
     return model_matrix;
 }
 
-/**
- * local transformation in regards to the worldtransformation of the parents
- * @return
- */
-glm::fmat4 Node::getWorldTransform() {
-    //return worldTransform;
-    if (parent_ != nullptr) {
-        return parent_->getWorldTransform() * getLocalTransform();
-    }
-    return localTransform_;
-}
 
 /**
  *
@@ -216,3 +222,4 @@ int Node::getDepth() {
 void Node::setName(std::string name) {
     this->name_ = name;
 }
+

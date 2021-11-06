@@ -30,6 +30,7 @@ public:
     void addChildren(std::shared_ptr<Node> child);
 
     glm::fmat4 getLocalTransform();
+    glm::fmat4 calculateLocalTransform();
     glm::fmat4 getWorldTransform();
 
     std::string getName();

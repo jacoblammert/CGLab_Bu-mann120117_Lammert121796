@@ -131,15 +131,47 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
                                                 0, 0, 0, 1));
 /**/
 
-    moon_node->setLocalTransform(glm::fmat4(0.1f, 0, 0, 3, // Moon
-                                            0, 0.1f, 0, 0,
-                                            0, 0, 0.1f, 0,
+    moon_node->setLocalTransform(glm::fmat4(0.3f, 0, 0, 3, // Moon
+                                            0, 0.3f, 0, 0,
+                                            0, 0, 0.3f, 0,
                                             0, 0, 0, 1));
 
 
 
     std::cout << sceneGraph_->printGraph() << "\n";
     // we print the graph of the solar system
+
+    load_planets();
+
+}
+
+void ApplicationSolar::load_planets() {
+
+
+
+    std::vector<std::shared_ptr<Node>> nodes = sceneGraph_->getRoot()->getChildrenList();
+    // we get all the children of the root node
+    planets_ = std::vector<std::shared_ptr<GeometryNode>>{};
+    // we create a vector with all planets we want to draw
+
+    int i = 0;
+
+    do {
+        for (auto &&node : nodes[i]->getChildrenList()) {
+            nodes.push_back(node);
+            // we add all nodes in the scene graph to our nodes vector
+        }
+        if (!nodes[i]->getName().empty()) {
+            // check if node has name, if not, ignore, else add to planets
+            planets_.push_back(std::static_pointer_cast<GeometryNode, Node>(nodes[i]));
+            // since we need to cast the node (we return a node object), we loose the geometry data
+            planets_[planets_.size() - 1]->setGeometry(planet_object);
+            // we need to set the geometry again because we get nodes from getChildrenList and not geometry nodes
+        }
+
+        i++;
+    } while (i < nodes.size());
+
 }
 
 ApplicationSolar::~ApplicationSolar() {
@@ -152,37 +184,15 @@ void ApplicationSolar::render() const {
     // bind shader to upload uniforms
     glUseProgram(m_shaders.at("planet").handle);
 
-    std::shared_ptr<Node> root = sceneGraph_->getRoot(); // we get the root node of the scene graph
-
-    std::vector<std::shared_ptr<Node>> nodes = root->getChildrenList();
-    // we get all the children of the root node
-    std::vector<std::shared_ptr<GeometryNode>> planets = std::vector<std::shared_ptr<GeometryNode>>{};
-    // we create a vector with all planets we want to draw
-
-    int i = 0;
-
-    do {
-        for (auto &&node : nodes[i]->getChildrenList()) {
-            nodes.push_back(node);
-            // we add all nodes in the scene graph to our nodes vector
-        }
-        if (!nodes[i]->getName().empty()) {
-            // check if node has name, if not, ignore, else add to planets
-            planets.push_back(std::static_pointer_cast<GeometryNode, Node>(nodes[i]));
-            // since we need to cast the node (we return a node object), we loose the geometry data
-            planets[planets.size() - 1]->setGeometry(planet_object);
-            // we need to set the geometry again because we get nodes from getChildrenList and not geometry nodes
-        }
-
-        i++;
-    } while (i < nodes.size());
+    //std::shared_ptr<Node> root = sceneGraph_->getRoot(); // we get the root node of the scene graph
 
 
-    for (int i = 0; i < planets.size(); ++i) {
+
+    for (int i = 0; i < planets_.size(); ++i) {
         // loop over all planets, draw each one
 
 
-        glm::fmat4 model_matrix = planets[i]->getWorldTransform(); // the model matrix will return the matrix with our world transform
+        glm::fmat4 model_matrix = planets_[i]->getWorldTransform(); // the model matrix will return the matrix with our world transform
         // -> more calculations than necessary, but its simpler to implement
 
 
@@ -196,15 +206,11 @@ void ApplicationSolar::render() const {
 
 
         // bind the VAO to draw
-        glBindVertexArray(planets[i]->getGeometry().vertex_AO);
-
-
-
+        glBindVertexArray(planets_[i]->getGeometry().vertex_AO);
 
         // draw bound vertex array using bound shader
-        glDrawElements(planets[i]->getGeometry().draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
+        glDrawElements(planets_[i]->getGeometry().draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
     }
-
 }
 
 void ApplicationSolar::uploadView() {
@@ -322,6 +328,44 @@ void ApplicationSolar::resizeCallback(unsigned width, unsigned height) {
     m_view_projection = utils::calculate_projection_matrix(float(width) / float(height));
     // upload new projection matrix
     uploadProjection();
+}
+
+void ApplicationSolar::load_star_shader() {
+    // rescources/shader/... path
+    // somehow bind shader as object or as number in opengl idk how
+
+}
+
+void ApplicationSolar::generate_stars() {
+
+    // load shaders ?
+    // load_star_shader()
+
+    // generates planets and binds them to a VBO VAO?
+    // random values from 0 to 2
+    // val = val - 1
+
+    // we need to look at the initializeGeometry function and change it up?
+    // or we could save the stars as an obj file, load it up and reuse more code? (objs are relatively easy)
+
+    //while(sqrt(val.x^2 + val.y^2 + val.z^2) < 1)  // generate new values for x,y,z
+    // -> uniform random distribution inside a sphere -> very nice
+    // -> normalize vector with new values -> scale by value (stars are at the "horizon")
+    // -> generate values for rgb (not too dark)
+
+    // -> load into buffers (6 * nr. Stars * size(float)) large
+    // set mode to draw single points - (how do we set point size?)
+
+    // hope that the draw function can draw the stars
+
+}
+
+void ApplicationSolar::draw_stars() {
+    // takes id of stars in memory maybe?
+    // somehow draws them like the planets are drawn? but color comes from the fragment shader, verices from the vert shader?
+
+
+    // magic with matrices -> we see stars
 }
 
 

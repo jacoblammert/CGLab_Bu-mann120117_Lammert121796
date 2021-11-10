@@ -32,6 +32,8 @@ public:
 
     std::vector<std::shared_ptr<GeometryNode>> planets_;
 
+    model_object stars_;
+
 protected:
     void load_planets();
 

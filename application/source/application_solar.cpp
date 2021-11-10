@@ -248,7 +248,15 @@ void ApplicationSolar::initializeShaderPrograms() {
     m_shaders.at("planet").u_locs["ModelMatrix"] = -1;
     m_shaders.at("planet").u_locs["ViewMatrix"] = -1;
     m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
-    
+
+
+    // store shader program objects in container
+    m_shaders.emplace("star", shader_program{{{GL_VERTEX_SHADER, m_resource_path + "shaders/star.vert"},
+                                                {GL_FRAGMENT_SHADER, m_resource_path + "shaders/star.frag"}}});
+    // request uniform locations for shader program
+    m_shaders.at("star").u_locs["ModelMatrix"] = -1;
+    m_shaders.at("star").u_locs["ViewMatrix"] = -1;
+    m_shaders.at("star").u_locs["ProjectionMatrix"] = -1;
 }
 
 // load models

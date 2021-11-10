@@ -362,35 +362,10 @@ void ApplicationSolar::resizeCallback(unsigned width, unsigned height) {
     uploadProjection();
 }
 
-void ApplicationSolar::load_star_shader() {
-    // rescources/shader/... path
-    // somehow bind shader as object or as number in opengl idk how
-
-}
-
 void ApplicationSolar::generate_stars() {
 
-    // load shaders ?
-    // load_star_shader()
 
-    // generates planets and binds them to a VBO VAO?
-    // random values from 0 to 2
-    // val = val - 1
-
-    // we need to look at the initializeGeometry function and change it up?
-    // or we could save the stars as an obj file, load it up and reuse more code? (objs are relatively easy)
-
-    //while(sqrt(val.x^2 + val.y^2 + val.z^2) < 1)  // generate new values for x,y,z
-    // -> uniform random distribution inside a sphere -> very nice
-    // -> normalize vector with new values -> scale by value (stars are at the "horizon")
-    // -> generate values for rgb (not too dark)
-
-    // -> load into buffers (6 * nr. Stars * size(float)) large
-    // set mode to draw single points - (how do we set point size?)
-
-    // hope that the draw function can draw the stars
-
-    int number_stars = 5000;
+    int number_stars = 2000;
 
     std::vector<GLfloat> data;
 
@@ -403,9 +378,9 @@ void ApplicationSolar::generate_stars() {
 
         std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 
-        float x = (distribution(generator) * 2 -1);
-        float y = (distribution(generator) * 2 -1);
-        float z = (distribution(generator) * 2 -1);
+        float x = (distribution(generator) * 2 - 1);
+        float y = (distribution(generator) * 2 - 1);
+        float z = (distribution(generator) * 2 - 1);
 
         float len = (float) sqrt(x * x + y * y + z * z);
 
@@ -413,9 +388,9 @@ void ApplicationSolar::generate_stars() {
         y /= len; // skydome
         z /= len; // skydome
 
-        x *= 60;
-        y *= 60;
-        z *= 60;
+        x *= 30;
+        y *= 30;
+        z *= 30;
 
 
         // Position
@@ -437,8 +412,6 @@ void ApplicationSolar::generate_stars() {
         //std::cout << x << "\n" << y << "\n" << z  << "\n" << r << "\n" << g << "\n" << b << "\n\n";
     }
 
-    //exit(0);
-
     glGenVertexArrays(1, &stars_.vertex_AO);
     glBindVertexArray(stars_.vertex_AO);
 
@@ -459,14 +432,6 @@ void ApplicationSolar::generate_stars() {
     stars_.draw_mode = GL_POINTS;
     stars_.num_elements = GLsizei(number_stars);
 
-}
-
-void ApplicationSolar::draw_stars() {
-    // takes id of stars in memory maybe?
-    // somehow draws them like the planets are drawn? but color comes from the fragment shader, verices from the vert shader?
-
-
-    // magic with matrices -> we see stars
 }
 
 

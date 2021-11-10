@@ -37,11 +37,8 @@ public:
 protected:
     void load_planets();
 
-    void load_star_shader();
-
     void generate_stars();
 
-    void draw_stars();
 
     void initializeShaderPrograms();
 

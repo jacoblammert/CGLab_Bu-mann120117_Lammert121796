@@ -10,11 +10,16 @@ uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 
+uniform float dist;
+
+
 out vec3 pass_Color;
 
 
 void main(void)
 {
-	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0);
+	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position * dist, 1.0);
+	// in_Position * dist scales the ring to the size of the orbit
+	// the rest transforms the view
 	pass_Color = in_Color;
 }

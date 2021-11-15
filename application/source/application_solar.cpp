@@ -60,6 +60,8 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
 
     // values for different positions
     std::vector<int> position = {10, -5, -2, 6, -4, 20, 8, -1, 2, 4, -3};
+    // TODO add:
+    // std::vector<int> distance = {0, 0.39f, 0.72f, 1.0f, 1.52f, 5.2f, 9.54f, 19.2f, 30.06f}; // distance in Au
 
     for (int i = 0; i < names.size(); ++i) {
 
@@ -91,7 +93,7 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
 
 
 
-        // unique position for each planet
+        // unique position for each planet TODO make distance in Au, scale it up, change rotation speed for each planet (based on the distance)
         float x = position[(i * (i + 1)) % position.size()];
         float z = position[i % position.size()];
         float scale = 1; // all planets have the same size
@@ -192,15 +194,9 @@ ApplicationSolar::~ApplicationSolar() {
 }
 
 void ApplicationSolar::render() const {
-    // bind shader to upload uniforms
-    glUseProgram(m_shaders.at("planet").handle);
-
-    //std::shared_ptr<Node> root = sceneGraph_->getRoot(); // we get the root node of the scene graph
-
-
 
     for (int i = 0; i < planets_.size(); ++i) {
-
+        // bind shader to upload uniforms
         glUseProgram(m_shaders.at("planet").handle);
         // loop over all planets, draw each one
 
@@ -231,34 +227,18 @@ void ApplicationSolar::render() const {
         if (planets_[i]->getName() != "Sun" && planets_[i]->getName() != "Light" &&
             planets_[i]->getParent()->getParent() != nullptr) {
 
-            model_object ring = planets_[i]->getTrail();
-
-            model_matrix = planets_[i]->getParent()->getParent()->getWorldTransform();
-
-
 
             glm::fmat4 local = planets_[i]->getParent()->getLocalTransform();
-
-
             float dist = (float) sqrt(pow(local[0][3],2) + pow(local[1][3],2) + pow(local[2][3],2));
 
+            glUniform1f(m_shaders.at("ring").u_locs.at("dist"),dist);
 
-            //std::cout << planets_[i]->getName() << " " << local[0][3] << " " << local[1][3] << " " << local[2][3] << " " << dist << "\n";
-
-
-            model_matrix[0][3] /= dist;
-            model_matrix[1][3] /= dist;
-            model_matrix[2][3] /= dist;
-            model_matrix[3][3] /= dist;
-            std::cout << planets_[i]->getName() << " " << model_matrix[0][0] << " " << model_matrix[1][0] << " " << model_matrix[2][0] << " " << model_matrix[3][0] << "\n";
-            std::cout << planets_[i]->getName() << " " << model_matrix[0][1] << " " << model_matrix[1][1] << " " << model_matrix[2][1] << " " << model_matrix[3][1] << "\n";
-            std::cout << planets_[i]->getName() << " " << model_matrix[0][2] << " " << model_matrix[1][2] << " " << model_matrix[2][2] << " " << model_matrix[3][2] << "\n";
-            std::cout << planets_[i]->getName() << " " << model_matrix[0][3] << " " << model_matrix[1][3] << " " << model_matrix[2][3] << " " << model_matrix[3][3] << "\n";
-
-
+            model_matrix = planets_[i]->getParent()->getParent()->getWorldTransform();
             glUniformMatrix4fv(m_shaders.at("ring").u_locs.at("ModelMatrix"),
                                1, GL_FALSE, glm::value_ptr(model_matrix));
 
+
+            model_object ring = planets_[i]->getTrail();//　花
             // bind the VAO to draw
             glBindVertexArray(ring.vertex_AO);
             glDrawArrays(ring.draw_mode, GLint(0), ring.num_elements);
@@ -346,6 +326,7 @@ void ApplicationSolar::initializeShaderPrograms() {
     m_shaders.at("ring").u_locs["ModelMatrix"] = -1;
     m_shaders.at("ring").u_locs["ViewMatrix"] = -1;
     m_shaders.at("ring").u_locs["ProjectionMatrix"] = -1;
+    m_shaders.at("ring").u_locs["dist"] = -1;
 
 }
 
@@ -460,6 +441,9 @@ void ApplicationSolar::generate_stars() {
         y *= 30;
         z *= 30;
 
+        x -= (distribution(generator) * 2 - 1) * 2;
+        y -= (distribution(generator) * 2 - 1) * 2;
+        z -= (distribution(generator) * 2 - 1) * 2;
 
         // Position
         data.push_back(x);

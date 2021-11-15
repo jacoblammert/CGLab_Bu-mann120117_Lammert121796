@@ -37,7 +37,10 @@ public:
 protected:
     void load_planets();
 
+
     void generate_stars();
+
+    void generate_trails();
 
 
     void initializeShaderPrograms();

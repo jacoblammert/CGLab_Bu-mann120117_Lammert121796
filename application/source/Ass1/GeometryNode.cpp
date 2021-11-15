@@ -18,3 +18,16 @@ model_object GeometryNode::getGeometry() {
 void GeometryNode::setGeometry(model_object model) {
     geometry_ = model;
 }
+/**
+ *
+ * @returns the trail of a planet
+ */
+model_object GeometryNode::getTrail() {
+    return trail_;
+}
+/**
+ * @param model - trail of the planet (ring)
+ */
+void GeometryNode::setTrail(model_object model) {
+    trail_ = model;
+}

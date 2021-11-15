@@ -54,22 +54,25 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
 
 
 
-    std::vector<std::string> names = {"Sun","Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus","Neptune","Pluto"};
+    std::vector<std::string> names = {"Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus",
+                                      "Neptune", "Pluto"};
     // List with Names for all of our planets
 
     // values for different positions
-    std::vector<int> position = {10, -5, -2, 6, -4, 20, 8,-1, 2, 4, -3};
+    std::vector<int> position = {10, -5, -2, 6, -4, 20, 8, -1, 2, 4, -3};
 
     for (int i = 0; i < names.size(); ++i) {
 
-        std::shared_ptr<GeometryNode> planet = std::make_shared<GeometryNode>(GeometryNode()); // initializing geometry node
+        std::shared_ptr<GeometryNode> planet = std::make_shared<GeometryNode>(
+                GeometryNode()); // initializing geometry node
 
 
-        std::shared_ptr<Node> planet_node = std::make_shared<Node>(Node()); // node which contains the geometry node as child
+        std::shared_ptr<Node> planet_node = std::make_shared<Node>(
+                Node()); // node which contains the geometry node as child
 
         planet->setName(names[i]); // we set the name of the planet (we draw shapes with names)
 
-        if(i == 0){
+        if (i == 0) {
             point_light->addChildren(planet); // add child (sun) to point_light
             planet->setParent(point_light); // add point light as parent for sun
 
@@ -77,7 +80,7 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
                                                  0, 2, 0, 0,
                                                  0, 0, 2, 0,
                                                  0, 0, 0, 1)); // transformation for the sun
-        }else{
+        } else {
             planet_node->addChildren(planet); // add planet as child to planet node
             planet->setParent(planet_node);
             planet_node->setParent(root);
@@ -89,11 +92,11 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
 
 
         // unique position for each planet
-        float x = position[(i*(i+1)) % position.size()];
+        float x = position[(i * (i + 1)) % position.size()];
         float z = position[i % position.size()];
         float scale = 1; // all planets have the same size
 
-        if (i == 0){
+        if (i == 0) {
             x = 0;
             z = 0;
             scale = 2;
@@ -123,13 +126,12 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
     moon->setParent(moon_node);
 
 
-
     moon->setName("Moon"); // set the name for the moon (to draw it)
 
     /**/earth_node->setLocalTransform(glm::fmat4(1, 0, 0, 10, // Earth
                                                  0, 1, 0, 0,
-                                                0, 0, 1, 0,
-                                                0, 0, 0, 1));
+                                                 0, 0, 1, 0,
+                                                 0, 0, 0, 1));
 /**/
 
     moon_node->setLocalTransform(glm::fmat4(0.3f, 0, 0, 3, // Moon
@@ -138,16 +140,18 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
                                             0, 0, 0, 1));
 
 
-
     std::cout << sceneGraph_->printGraph() << "\n";
     // we print the graph of the solar system
 
     load_planets();
+
+    generate_trails();
+
     generate_stars();
 }
 
-void ApplicationSolar::load_planets() {
 
+void ApplicationSolar::load_planets() {
 
 
     std::vector<std::shared_ptr<Node>> nodes = sceneGraph_->getRoot()->getChildrenList();
@@ -184,6 +188,7 @@ ApplicationSolar::~ApplicationSolar() {
     glDeleteBuffers(1, &stars_.vertex_BO);
     glDeleteBuffers(1, &stars_.element_BO);
     glDeleteVertexArrays(1, &stars_.vertex_AO);
+
 }
 
 void ApplicationSolar::render() const {
@@ -195,6 +200,8 @@ void ApplicationSolar::render() const {
 
 
     for (int i = 0; i < planets_.size(); ++i) {
+
+        glUseProgram(m_shaders.at("planet").handle);
         // loop over all planets, draw each one
 
         glm::fmat4 model_matrix = planets_[i]->getWorldTransform(); // the model matrix will return the matrix with our world transform
@@ -215,8 +222,48 @@ void ApplicationSolar::render() const {
 
         // draw bound vertex array using bound shader
         glDrawElements(planets_[i]->getGeometry().draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
-    }
 
+
+
+        // Draw Trails for each Planet (not for the sun)
+        glUseProgram(m_shaders.at("ring").handle);
+
+        if (planets_[i]->getName() != "Sun" && planets_[i]->getName() != "Light" &&
+            planets_[i]->getParent()->getParent() != nullptr) {
+
+            model_object ring = planets_[i]->getTrail();
+
+            model_matrix = planets_[i]->getParent()->getParent()->getWorldTransform();
+
+
+
+            glm::fmat4 local = planets_[i]->getParent()->getLocalTransform();
+
+
+            float dist = (float) sqrt(pow(local[0][3],2) + pow(local[1][3],2) + pow(local[2][3],2));
+
+
+            //std::cout << planets_[i]->getName() << " " << local[0][3] << " " << local[1][3] << " " << local[2][3] << " " << dist << "\n";
+
+
+            model_matrix[0][3] /= dist;
+            model_matrix[1][3] /= dist;
+            model_matrix[2][3] /= dist;
+            model_matrix[3][3] /= dist;
+            std::cout << planets_[i]->getName() << " " << model_matrix[0][0] << " " << model_matrix[1][0] << " " << model_matrix[2][0] << " " << model_matrix[3][0] << "\n";
+            std::cout << planets_[i]->getName() << " " << model_matrix[0][1] << " " << model_matrix[1][1] << " " << model_matrix[2][1] << " " << model_matrix[3][1] << "\n";
+            std::cout << planets_[i]->getName() << " " << model_matrix[0][2] << " " << model_matrix[1][2] << " " << model_matrix[2][2] << " " << model_matrix[3][2] << "\n";
+            std::cout << planets_[i]->getName() << " " << model_matrix[0][3] << " " << model_matrix[1][3] << " " << model_matrix[2][3] << " " << model_matrix[3][3] << "\n";
+
+
+            glUniformMatrix4fv(m_shaders.at("ring").u_locs.at("ModelMatrix"),
+                               1, GL_FALSE, glm::value_ptr(model_matrix));
+
+            // bind the VAO to draw
+            glBindVertexArray(ring.vertex_AO);
+            glDrawArrays(ring.draw_mode, GLint(0), ring.num_elements);
+        }
+    }
 
 
     glUseProgram(m_shaders.at("star").handle);
@@ -239,6 +286,10 @@ void ApplicationSolar::uploadView() {
     glUseProgram(m_shaders.at("star").handle);
     glUniformMatrix4fv(m_shaders.at("star").u_locs.at("ViewMatrix"),
                        1, GL_FALSE, glm::value_ptr(view_matrix));
+    // bind shader to which to upload unforms
+    glUseProgram(m_shaders.at("ring").handle);
+    glUniformMatrix4fv(m_shaders.at("ring").u_locs.at("ViewMatrix"),
+                       1, GL_FALSE, glm::value_ptr(view_matrix));
 }
 
 void ApplicationSolar::uploadProjection() {
@@ -250,6 +301,10 @@ void ApplicationSolar::uploadProjection() {
     // bind shader to which to upload unforms
     glUseProgram(m_shaders.at("star").handle);
     glUniformMatrix4fv(m_shaders.at("star").u_locs.at("ProjectionMatrix"),
+                       1, GL_FALSE, glm::value_ptr(m_view_projection));
+    // bind shader to which to upload unforms
+    glUseProgram(m_shaders.at("ring").handle);
+    glUniformMatrix4fv(m_shaders.at("ring").u_locs.at("ProjectionMatrix"),
                        1, GL_FALSE, glm::value_ptr(m_view_projection));
 }
 
@@ -276,11 +331,22 @@ void ApplicationSolar::initializeShaderPrograms() {
 
     // store shader program objects in container
     m_shaders.emplace("star", shader_program{{{GL_VERTEX_SHADER, m_resource_path + "shaders/star.vert"},
-                                                {GL_FRAGMENT_SHADER, m_resource_path + "shaders/star.frag"}}});
+                                                     {GL_FRAGMENT_SHADER, m_resource_path + "shaders/star.frag"}}});
     // request uniform locations for shader program
     //m_shaders.at("star").u_locs["ModelMatrix"] = -1;
     m_shaders.at("star").u_locs["ViewMatrix"] = -1;
     m_shaders.at("star").u_locs["ProjectionMatrix"] = -1;
+
+    // ring shader
+
+    // store shader program objects in container
+    m_shaders.emplace("ring", shader_program{{{GL_VERTEX_SHADER, m_resource_path + "shaders/ring.vert"},
+                                                     {GL_FRAGMENT_SHADER, m_resource_path + "shaders/ring.frag"}}});
+    // request uniform locations for shader program
+    m_shaders.at("ring").u_locs["ModelMatrix"] = -1;
+    m_shaders.at("ring").u_locs["ViewMatrix"] = -1;
+    m_shaders.at("ring").u_locs["ProjectionMatrix"] = -1;
+
 }
 
 // load models
@@ -349,8 +415,10 @@ void ApplicationSolar::keyCallback(int key, int action, int mods) {
 //handle delta mouse movement input
 void ApplicationSolar::mouseCallback(double pos_x, double pos_y) {
     // mouse handling
-    m_view_transform = glm::rotate(m_view_transform, glm::radians(-(float) pos_x / 60), glm::vec3{0.0f, 1.0f, 0.0f}); // horizontal rotation
-    m_view_transform = glm::rotate(m_view_transform, glm::radians(-(float) pos_y / 60), glm::vec3{1.0f, 0.0f, 0.0f}); // vertical rotation
+    m_view_transform = glm::rotate(m_view_transform, glm::radians(-(float) pos_x / 60),
+                                   glm::vec3{0.0f, 1.0f, 0.0f}); // horizontal rotation
+    m_view_transform = glm::rotate(m_view_transform, glm::radians(-(float) pos_y / 60),
+                                   glm::vec3{1.0f, 0.0f, 0.0f}); // vertical rotation
     uploadView();
 }
 
@@ -434,6 +502,76 @@ void ApplicationSolar::generate_stars() {
 
 }
 
+
+void ApplicationSolar::generate_trails() {
+
+    model_object ring_object;
+
+    int resolution = 100;
+
+    std::vector<GLfloat> data;
+
+    data.reserve(resolution * 6 * sizeof(float));
+
+    for (int i = 0; i < resolution; ++i) {
+
+
+        float x = (float) cos((4 * acos(0.0) * (float) i) / (float) resolution);
+        float y = 0;
+        float z = (float) sin((4 * acos(0.0) * (float) i) / (float) resolution);
+
+        // Position
+        data.push_back(x);
+        data.push_back(y);
+        data.push_back(z);
+
+        //float brightness = 0.4f;
+
+        float r = 1;//(float) i / (float) resolution;
+        float g = 1;//(float) i / (float) resolution;
+        float b = 1;//(float) i / (float) resolution;
+        
+        // Color
+        data.push_back(r);
+        data.push_back(g);
+        data.push_back(b);
+
+        //std::cout << x << "\n" << y << "\n" << z  << "\n" << r << "\n" << g << "\n" << b << "\n\n";
+    }
+    // generate model (ring)
+    glGenVertexArrays(1, &ring_object.vertex_AO);
+    glBindVertexArray(ring_object.vertex_AO);
+
+    glGenBuffers(1, &ring_object.vertex_BO);
+    glBindBuffer(GL_ARRAY_BUFFER, ring_object.vertex_BO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * data.size(),
+                 data.data(), GL_STATIC_DRAW);
+
+    // attribute array for positions
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, GLsizei(6 * sizeof(float)), nullptr);
+
+    // attribute array for rgb colour
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, GLsizei(6 * sizeof(float)),
+                          (void *) (sizeof(float) * 3));
+
+    ring_object.draw_mode = GL_LINE_LOOP;
+    ring_object.num_elements = GLsizei(resolution);
+
+    for (int i = 0; i < planets_.size(); ++i) {
+
+        // set models
+        //if (planets_[i]->getName() != "Sun"){
+
+        planets_[i]->setTrail(ring_object);
+
+        std::cout << ring_object.vertex_AO << "\n";
+        std::cout << ring_object.vertex_BO << "\n";
+        std::cout << ring_object.num_elements << "\n";
+        std::cout << ring_object.element_BO << "\n";
+    }
+}
 
 // exe entry point
 int main(int argc, char *argv[]) {

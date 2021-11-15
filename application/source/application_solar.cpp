@@ -60,8 +60,8 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
 
     // values for different positions
     std::vector<int> position = {10, -5, -2, 6, -4, 20, 8, -1, 2, 4, -3};
-    // TODO add:
-    // std::vector<int> distance = {0, 0.39f, 0.72f, 1.0f, 1.52f, 5.2f, 9.54f, 19.2f, 30.06f}; // distance in Au
+    // TODO add:                  sun, mercury,venus,earth,mars,jupiter,saturn,uranus,neptune
+    // std::vector<int> distance = {0, 0.39f, 0.72f, 1.0f, 1.52f, 5.2f, 9.54f, 19.2f, 30.06f, idk pluto}; // distance in Au
 
     for (int i = 0; i < names.size(); ++i) {
 
@@ -136,7 +136,7 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
                                                  0, 0, 0, 1));
 /**/
 
-    moon_node->setLocalTransform(glm::fmat4(0.3f, 0, 0, 3, // Moon
+    moon_node->setLocalTransform(glm::fmat4(0.3f, 0, 0, 3, // Moon 0.00256957366 Au
                                             0, 0.3f, 0, 0,
                                             0, 0, 0.3f, 0,
                                             0, 0, 0, 1));

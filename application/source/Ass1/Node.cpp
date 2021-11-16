@@ -133,14 +133,16 @@ glm::fmat4 Node::getWorldTransform() {
 glm::fmat4 Node::calculateLocalTransform() {
     glm::fmat4 model_matrix = glm::fmat4{1.0};
     // rotation around the center (sun)
-    model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() * (name_.length() + 1)), glm::fvec3{0.0f, 1.0f, 0.0f});
+    model_matrix = glm::rotate(glm::fmat4{}, float(glfwGetTime() / (localTransform_[0][3]+1)), glm::fvec3{0.0f, 1.0f, 0.0f});
+
+    std::cout<<"value: " << localTransform_[0][3] << "\n";
 
     // translation
     model_matrix = glm::translate(model_matrix,
                                   glm::vec3(localTransform_[0][3], localTransform_[1][3], localTransform_[2][3]));
 
     // rotation around its axis
-    model_matrix = glm::rotate(model_matrix, float(glfwGetTime() * (name_.length() + 1)), glm::fvec3{0.0f, 1.0f, 0.0f});
+    model_matrix = glm::rotate(model_matrix, float(glfwGetTime()  / (localTransform_[0][3]+1)), glm::fvec3{0.0f, 1.0f, 0.0f});
 
     // Scaling
     model_matrix = model_matrix * glm::fmat4(localTransform_[0][0], localTransform_[0][1], localTransform_[0][2], 0,

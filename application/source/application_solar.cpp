@@ -57,20 +57,14 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
     std::vector<std::string> names = {"Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus",
                                       "Neptune", "Pluto"};
     // List with Names for all of our planets
-
-    // values for different positions
-    std::vector<int> position = {10, -5, -2, 6, -4, 20, 8, -1, 2, 4, -3};
-    // TODO add:                  sun, mercury,venus,earth,mars,jupiter,saturn,uranus,neptune
-    // std::vector<int> distance = {0, 0.39f, 0.72f, 1.0f, 1.52f, 5.2f, 9.54f, 19.2f, 30.06f, idk pluto}; // distance in Au
+    std::vector<float> distance = {0, 0.39f, 0.72f, 1.0f, 1.52f, 5.2f, 9.54f, 19.2f, 30.06f, 35}; // distance in Au
 
     for (int i = 0; i < names.size(); ++i) {
 
-        std::shared_ptr<GeometryNode> planet = std::make_shared<GeometryNode>(
-                GeometryNode()); // initializing geometry node
+        std::shared_ptr<GeometryNode> planet = std::make_shared<GeometryNode>(GeometryNode()); // initializing geometry node
 
 
-        std::shared_ptr<Node> planet_node = std::make_shared<Node>(
-                Node()); // node which contains the geometry node as child
+        std::shared_ptr<Node> planet_node = std::make_shared<Node>(Node()); // node which contains the geometry node as child
 
         planet->setName(names[i]); // we set the name of the planet (we draw shapes with names)
 
@@ -78,10 +72,10 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
             point_light->addChildren(planet); // add child (sun) to point_light
             planet->setParent(point_light); // add point light as parent for sun
 
-            planet->setLocalTransform(glm::fmat4(2, 0, 0, 0,
-                                                 0, 2, 0, 0,
-                                                 0, 0, 2, 0,
-                                                 0, 0, 0, 1)); // transformation for the sun
+            planet->setLocalTransform(glm::fmat4(0.1, 0, 0, 0,
+                                                 0, 0.1, 0, 0,
+                                                 0, 0, 0.1, 0,
+                                                 0, 0, 0, 0.1)); // transformation for the sun
         } else {
             planet_node->addChildren(planet); // add planet as child to planet node
             planet->setParent(planet_node);
@@ -91,24 +85,10 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
         }
 
 
-
-
-        // unique position for each planet TODO make distance in Au, scale it up, change rotation speed for each planet (based on the distance)
-        float x = position[(i * (i + 1)) % position.size()];
-        float z = position[i % position.size()];
-        float scale = 1; // all planets have the same size
-
-        if (i == 0) {
-            x = 0;
-            z = 0;
-            scale = 2;
-            // planet 0 is the sun -> size is different, pos = (0,0,0)
-        }
-
         // we set local transformation with y = 0 all planets are in the same plane
-        planet_node->setLocalTransform(glm::fmat4(scale, 0, 0, x,
-                                                  0, scale, 0, 0,
-                                                  0, 0, scale, z,
+        planet_node->setLocalTransform(glm::fmat4(0.1f, 0, 0, distance[i] * 1.5f,
+                                                  0, 0.1f, 0, 0,
+                                                  0, 0, 0.1f, 0,
                                                   0, 0, 0, 1));
     }
 
@@ -130,13 +110,7 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
 
     moon->setName("Moon"); // set the name for the moon (to draw it)
 
-    /**/earth_node->setLocalTransform(glm::fmat4(1, 0, 0, 10, // Earth
-                                                 0, 1, 0, 0,
-                                                 0, 0, 1, 0,
-                                                 0, 0, 0, 1));
-/**/
-
-    moon_node->setLocalTransform(glm::fmat4(0.3f, 0, 0, 3, // Moon 0.00256957366 Au
+    moon_node->setLocalTransform(glm::fmat4(0.3f, 0, 0, 3.3256957366f, // Moon 0.00256957366 Au
                                             0, 0.3f, 0, 0,
                                             0, 0, 0.3f, 0,
                                             0, 0, 0, 1));
@@ -196,52 +170,82 @@ ApplicationSolar::~ApplicationSolar() {
 void ApplicationSolar::render() const {
 
     for (int i = 0; i < planets_.size(); ++i) {
-        // bind shader to upload uniforms
-        glUseProgram(m_shaders.at("planet").handle);
-        // loop over all planets, draw each one
+        if (planets_[i]->getName() != "Light"){ // we dont draw a planet or a ring if we have the light node
 
-        glm::fmat4 model_matrix = planets_[i]->getWorldTransform(); // the model matrix will return the matrix with our world transform
-        // -> more calculations than necessary, but its simpler to implement
+            // bind shader to upload uniforms
+            glUseProgram(m_shaders.at("planet").handle);
+            // loop over all planets, draw each one
 
-
-        glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
-                           1, GL_FALSE, glm::value_ptr(model_matrix));
-
-        // extra matrix for normal transformation to keep them orthogonal to surface
-        glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
-        glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
-                           1, GL_FALSE, glm::value_ptr(normal_matrix));
+            glm::fmat4 model_matrix = planets_[i]->getWorldTransform(); // the model matrix will return the matrix with our world transform
+            // -> more calculations than necessary, but its simpler to implement
 
 
-        // bind the VAO to draw
-        glBindVertexArray(planets_[i]->getGeometry().vertex_AO);
-
-        // draw bound vertex array using bound shader
-        glDrawElements(planets_[i]->getGeometry().draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
-
-
-
-        // Draw Trails for each Planet (not for the sun)
-        glUseProgram(m_shaders.at("ring").handle);
-
-        if (planets_[i]->getName() != "Sun" && planets_[i]->getName() != "Light" &&
-            planets_[i]->getParent()->getParent() != nullptr) {
-
-
-            glm::fmat4 local = planets_[i]->getParent()->getLocalTransform();
-            float dist = (float) sqrt(pow(local[0][3],2) + pow(local[1][3],2) + pow(local[2][3],2));
-
-            glUniform1f(m_shaders.at("ring").u_locs.at("dist"),dist);
-
-            model_matrix = planets_[i]->getParent()->getParent()->getWorldTransform();
-            glUniformMatrix4fv(m_shaders.at("ring").u_locs.at("ModelMatrix"),
+            glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("ModelMatrix"),
                                1, GL_FALSE, glm::value_ptr(model_matrix));
 
+            // extra matrix for normal transformation to keep them orthogonal to surface
+            glm::fmat4 normal_matrix = glm::inverseTranspose(glm::inverse(m_view_transform) * model_matrix);
+            glUniformMatrix4fv(m_shaders.at("planet").u_locs.at("NormalMatrix"),
+                               1, GL_FALSE, glm::value_ptr(normal_matrix));
 
-            model_object ring = planets_[i]->getTrail();//　花
+
             // bind the VAO to draw
-            glBindVertexArray(ring.vertex_AO);
-            glDrawArrays(ring.draw_mode, GLint(0), ring.num_elements);
+            glBindVertexArray(planets_[i]->getGeometry().vertex_AO);
+
+            // draw bound vertex array using bound shader
+            glDrawElements(planets_[i]->getGeometry().draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
+
+
+
+            // Draw Trails for each Planet (not for the sun)
+            glUseProgram(m_shaders.at("ring").handle); // we switch to the ring shader
+
+            if (planets_[i]->getName() != "Sun" && // we dont want to draw a ring for the sun
+            planets_[i]->getParent()->getParent() != nullptr) { // the parent of the parent must not be a nullptr
+
+
+                glm::fmat4 local = planets_[i]->getParent()->getLocalTransform(); // local transform
+                float dist = (float) sqrt(pow(local[0][3],2) + pow(local[1][3],2) + pow(local[2][3],2)); // distance to the origin of rotation (dist to planet it rotates around)
+
+                glUniform1f(m_shaders.at("ring").u_locs.at("dist"),dist); // distance from the planet to its origin of rotation
+
+
+
+                model_matrix = planets_[i]->getParent()->getParent()->getWorldTransform(); // world transform of the parent planet = parent parent nodes world transform
+                glUniformMatrix4fv(m_shaders.at("ring").u_locs.at("ModelMatrix"),
+                                   1, GL_FALSE, glm::value_ptr(model_matrix));
+
+
+                model_object ring = planets_[i]->getTrail();//　花
+                // bind the VAO to draw
+                glBindVertexArray(ring.vertex_AO);
+                glDrawArrays(ring.draw_mode, GLint(0), ring.num_elements);
+
+
+                if (planets_[i]->getName() == "Saturn"){
+                    int nr_rings = 7;
+                    float inner_radius = 1.5f;
+                    float outer_radius = 2.5f;
+                    for (int j = 0; j < nr_rings; ++j) {
+
+
+                        float dist = ((float)j/(float)nr_rings); // 0 to 1
+                        dist *= (outer_radius-inner_radius); // width of the jth ring
+                        dist += inner_radius; // inner radius for dist from center
+
+                        glUniform1f(m_shaders.at("ring").u_locs.at("dist"),dist);
+
+                        model_matrix = planets_[i]->getParent()->getWorldTransform(); // ring around saturn
+                        glUniformMatrix4fv(m_shaders.at("ring").u_locs.at("ModelMatrix"),
+                                           1, GL_FALSE, glm::value_ptr(model_matrix));
+
+                        model_object ring = planets_[i]->getTrail();//　花
+                        // bind the VAO to draw
+                        glBindVertexArray(ring.vertex_AO);
+                        glDrawArrays(ring.draw_mode, GLint(0), ring.num_elements);
+                    }
+                }
+            }
         }
     }
 
@@ -251,7 +255,6 @@ void ApplicationSolar::render() const {
     // bind the VAO to draw
     glBindVertexArray(stars_.vertex_AO);
     glDrawArrays(stars_.draw_mode, GLint(0), stars_.num_elements);
-    //std::cout<<"Number of stars: " <<  stars_.num_elements << "\n";
 }
 
 void ApplicationSolar::uploadView() {
@@ -415,16 +418,11 @@ void ApplicationSolar::generate_stars() {
 
 
     int number_stars = 2000;
-
     std::vector<GLfloat> data;
-
     data.reserve(number_stars * 6 * sizeof(float));
-
     std::default_random_engine generator;
 
     for (int i = 0; i < number_stars; ++i) {
-
-
         std::uniform_real_distribution<float> distribution(0.0f, 1.0f);
 
         float x = (distribution(generator) * 2 - 1);
@@ -460,8 +458,6 @@ void ApplicationSolar::generate_stars() {
         data.push_back(r);
         data.push_back(g);
         data.push_back(b);
-
-        //std::cout << x << "\n" << y << "\n" << z  << "\n" << r << "\n" << g << "\n" << b << "\n\n";
     }
 
     glGenVertexArrays(1, &stars_.vertex_AO);
@@ -490,16 +486,14 @@ void ApplicationSolar::generate_stars() {
 void ApplicationSolar::generate_trails() {
 
     model_object ring_object;
-
-    int resolution = 100;
-
     std::vector<GLfloat> data;
 
+    int resolution = 100;
     data.reserve(resolution * 6 * sizeof(float));
 
     for (int i = 0; i < resolution; ++i) {
 
-
+        // ring has a radius of 1
         float x = (float) cos((4 * acos(0.0) * (float) i) / (float) resolution);
         float y = 0;
         float z = (float) sin((4 * acos(0.0) * (float) i) / (float) resolution);
@@ -514,13 +508,11 @@ void ApplicationSolar::generate_trails() {
         float r = 1;//(float) i / (float) resolution;
         float g = 1;//(float) i / (float) resolution;
         float b = 1;//(float) i / (float) resolution;
-        
+
         // Color
         data.push_back(r);
         data.push_back(g);
         data.push_back(b);
-
-        //std::cout << x << "\n" << y << "\n" << z  << "\n" << r << "\n" << g << "\n" << b << "\n\n";
     }
     // generate model (ring)
     glGenVertexArrays(1, &ring_object.vertex_AO);
@@ -544,9 +536,6 @@ void ApplicationSolar::generate_trails() {
     ring_object.num_elements = GLsizei(resolution);
 
     for (int i = 0; i < planets_.size(); ++i) {
-
-        // set models
-        //if (planets_[i]->getName() != "Sun"){
 
         planets_[i]->setTrail(ring_object);
 

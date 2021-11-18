@@ -225,3 +225,35 @@ void Node::setName(std::string name) {
     this->name_ = name;
 }
 
+/**
+ *
+ * @return color as vector with 3 values
+ * glm:vector?
+ */
+std::vector<float> Node::getColor() {
+    return lightColor_;
+}
+
+/**
+ * set the values of the color for the light
+ * @param color
+ */
+void Node::setColor(std::vector<float> color) {
+    lightColor_ = std::move(color);
+}
+
+/**
+ * getter for the brightness
+ * @return
+ */
+float Node::getIntensity() {
+    return lightIntensity_;
+}
+
+/**
+ * getter for the brightness
+ * @param brightness
+ */
+void Node::setIntensity(float intensity) {
+    lightIntensity_ = intensity;
+}

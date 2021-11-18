@@ -39,6 +39,12 @@ public:
     int getDepth();
 
 
+    std::vector<float> getColor();
+    float getIntensity();
+
+    void setIntensity(float intensity);
+    void setColor(std::vector<float> color);
+
 protected:
     std::shared_ptr<Node> parent_;
     std::vector<std::shared_ptr<Node>> children_;
@@ -48,6 +54,8 @@ protected:
     glm::fmat4 localTransform_ = glm::fmat4(1.0);
     glm::fmat4 worldTransform_ = glm::fmat4(1.0);
 
+    std::vector<float> lightColor_ = {}; // private variable for the color
+    float lightIntensity_ = 1;
 
 };
 

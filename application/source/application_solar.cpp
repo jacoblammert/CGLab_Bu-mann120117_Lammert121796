@@ -51,7 +51,7 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
 
     point_light->setName("Light"); // for debugging
 
-
+    point_light->setColor({1,1,1});
 
 
     std::vector<std::string> names = {"Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus",
@@ -59,10 +59,16 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
     // List with Names for all of our planets
     std::vector<float> distance = {0, 0.39f, 0.72f, 1.0f, 1.52f, 5.2f, 9.54f, 19.2f, 30.06f, 35}; // distance in Au
 
+    std::vector<std::vector<float>> color = {{1,1,1}, {1,0.9f,0.7f}, {1,0.7f,0}, {0.5f,0.5f,1}, {1,0,0.1f}, {1,0.6f,0.3f}, {0.8f,0.8f,0.4f}, {0.7f,0.7f,0.9f}, {0.4f,0.5f,0.8f}, {0.9f,0,0.2f}}; // distance in Au
+
+
+
     for (int i = 0; i < names.size(); ++i) {
 
         std::shared_ptr<GeometryNode> planet = std::make_shared<GeometryNode>(GeometryNode()); // initializing geometry node
 
+        planet->setColor(color[i]);
+        planet->setIntensity(1);
 
         std::shared_ptr<Node> planet_node = std::make_shared<Node>(Node()); // node which contains the geometry node as child
 
@@ -109,6 +115,9 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
 
 
     moon->setName("Moon"); // set the name for the moon (to draw it)
+
+
+    moon->setColor({1,1,0.7f});
 
     moon_node->setLocalTransform(glm::fmat4(0.3f, 0, 0, 3.3256957366f, // Moon 0.00256957366 Au
                                             0, 0.3f, 0, 0,
@@ -191,6 +200,15 @@ void ApplicationSolar::render() const {
 
             // bind the VAO to draw
             glBindVertexArray(planets_[i]->getGeometry().vertex_AO);
+
+            std::vector<float> color = planets_[i]->getColor();
+
+            std::cout<< "Color: " << color[0] <<" " << color[1] <<" " << color[2] << "\n";
+
+            glUniform3f(m_shaders.at("planet").u_locs.at("light_pos"),0,0,0);
+            glUniform3f(m_shaders.at("planet").u_locs.at("color_ambient_"),color[0],color[1],color[2]);
+            glUniform3f(m_shaders.at("planet").u_locs.at("color_diffuse_"),color[0],color[1],color[2]);
+            glUniform3f(m_shaders.at("planet").u_locs.at("color_specular_"),1,1,1);
 
             // draw bound vertex array using bound shader
             glDrawElements(planets_[i]->getGeometry().draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
@@ -310,6 +328,11 @@ void ApplicationSolar::initializeShaderPrograms() {
     m_shaders.at("planet").u_locs["ModelMatrix"] = -1;
     m_shaders.at("planet").u_locs["ViewMatrix"] = -1;
     m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
+
+    m_shaders.at("planet").u_locs["light_pos"] = -1;
+    m_shaders.at("planet").u_locs["color_ambient_"] = -1;
+    m_shaders.at("planet").u_locs["color_diffuse_"] = -1;
+    m_shaders.at("planet").u_locs["color_specular_"] = -1;
 
 
     // store shader program objects in container

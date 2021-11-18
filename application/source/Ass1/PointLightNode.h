@@ -11,15 +11,15 @@
 class PointLightNode : public Node {
 
 public:
-    std::vector<int> getColor();
-    float getBrightness();
+    std::vector<float> getColor();
+    float getIntensity();
 
-    void setBrightness(float brightness);
-    void setColor(std::vector<int> color);
+    void setIntensity(float intensity);
+    void setColor(std::vector<float> color);
 
 private:
-    std::vector<int> color_ = {}; // private variable for the color
-    float brightness_ = 1;
+    std::vector<float> lightColor_ = {}; // private variable for the color
+    float lightIntensity_ = 1;
 };
 
 

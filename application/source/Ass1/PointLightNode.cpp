@@ -11,30 +11,30 @@
  * @return color as vector with 3 values
  * glm:vector?
  */
-std::vector<int> PointLightNode::getColor() {
-    return color_;
+std::vector<float> PointLightNode::getColor() {
+    return lightColor_;
 }
 
 /**
  * set the values of the color for the light
  * @param color
  */
-void PointLightNode::setColor(std::vector<int> color) {
-    color_ = std::move(color);
+void PointLightNode::setColor(std::vector<float> color) {
+    lightColor_ = std::move(color);
 }
 
 /**
  * getter for the brightness
  * @return
  */
-float PointLightNode::getBrightness() {
-    return brightness_;
+float PointLightNode::getIntensity() {
+    return lightIntensity_;
 }
 
 /**
  * getter for the brightness
  * @param brightness
  */
-void PointLightNode::setBrightness(float brightness) {
-    brightness_ = brightness;
+void PointLightNode::setIntensity(float intensity) {
+    lightIntensity_ = intensity;
 }

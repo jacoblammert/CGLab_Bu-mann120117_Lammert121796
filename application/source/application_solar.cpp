@@ -209,6 +209,7 @@ void ApplicationSolar::render() const {
             glUniform3f(m_shaders.at("planet").u_locs.at("color_ambient_"),color[0],color[1],color[2]);
             glUniform3f(m_shaders.at("planet").u_locs.at("color_diffuse_"),color[0],color[1],color[2]);
             glUniform3f(m_shaders.at("planet").u_locs.at("color_specular_"),1,1,1);
+            //glUniform3f(m_shaders.at("planet").u_locs.at("pos"),1,1,1);
 
             // draw bound vertex array using bound shader
             glDrawElements(planets_[i]->getGeometry().draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
@@ -471,7 +472,7 @@ void ApplicationSolar::generate_stars() {
         data.push_back(y);
         data.push_back(z);
 
-        float brightness = 0.4f;
+        float brightness = 0.0f;
 
         float r = (distribution(generator) * (1 - brightness) + brightness);
         float g = (distribution(generator) * (1 - brightness) + brightness);

@@ -203,11 +203,11 @@ void ApplicationSolar::render() const {
 
             std::vector<float> color = planets_[i]->getColor();
 
-            std::cout<< "Color: " << color[0] <<" " << color[1] <<" " << color[2] << "\n";
+            //std::cout<< "Color: " << color[0] <<" " << color[1] <<" " << color[2] << "\n";
 
             glUniform3f(m_shaders.at("planet").u_locs.at("light_pos"),0,0,0);
             glUniform3f(m_shaders.at("planet").u_locs.at("color_ambient_"),color[0],color[1],color[2]);
-            glUniform3f(m_shaders.at("planet").u_locs.at("color_diffuse_"),color[0],color[1],color[2]);
+            glUniform3f(m_shaders.at("planet").u_locs.at("color_diffuse_"),1,1,1);
             glUniform3f(m_shaders.at("planet").u_locs.at("color_specular_"),1,1,1);
             //glUniform3f(m_shaders.at("planet").u_locs.at("pos"),1,1,1);
 
@@ -334,6 +334,7 @@ void ApplicationSolar::initializeShaderPrograms() {
     m_shaders.at("planet").u_locs["color_ambient_"] = -1;
     m_shaders.at("planet").u_locs["color_diffuse_"] = -1;
     m_shaders.at("planet").u_locs["color_specular_"] = -1;
+    m_shaders.at("planet").u_locs["camera_pos"] = -1;
 
 
     // store shader program objects in container

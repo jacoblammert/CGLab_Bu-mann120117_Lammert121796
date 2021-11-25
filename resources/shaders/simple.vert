@@ -17,6 +17,7 @@ in  vec3 color_diffuse;
 in  vec3 color_specular;
 
 in  vec3 light_pos;
+//uniform vec3 camera_pos;
 
 out vec3 light_pos_out;
 out vec3 pass_Normal;
@@ -26,17 +27,23 @@ out vec4 pass_Position;
 out vec3 color_ambient_;
 out vec3 color_diffuse_;
 out vec3 color_specular_;
-out vec3 center;
+//out vec3 center_planet;
+out vec3 center_system;
+out vec3 camera_position;
 
 
 void main(void)
 {
 	gl_Position = (ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(in_Position, 1.0);
-	center = vec3((ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(0,0,0, 1.0));
-	pass_Normal = (NormalMatrix * vec4(in_Normal, 0.0)).xyz;
+	//center_planet = vec3((ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(0,0,0, 1.0));
+	pass_Normal = normalize(vec3(NormalMatrix * vec4(in_Normal, 0.0)));
+
+	center_system = vec3(ViewMatrix * vec4(0,0,0, 1.0));
+    camera_position  = vec3(ProjectionMatrix * ViewMatrix * vec4(1.0, 1.0, 1.0, 1.0));
+
 	pass_Position = gl_Position;
 
-    light_pos_out = vec3((ProjectionMatrix  * ViewMatrix) * vec4(light_pos, 1.0));
+    light_pos_out = vec3(ViewMatrix * vec4(light_pos, 1.0));
 
     color_ambient_ = color_ambient;
     color_diffuse_ = color_diffuse;

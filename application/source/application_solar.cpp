@@ -50,8 +50,8 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
     point_light->setParent(root);// set parent of point light
 
     point_light->setName("Light"); // for debugging
-
-    point_light->setColor({1,1,1});
+    point_light->setIntensity(1.0f);
+    point_light->setColor({1,1,0.8f});
 
 
     std::vector<std::string> names = {"Sun", "Mercury", "Venus", "Earth", "Mars", "Jupiter", "Saturn", "Uranus",
@@ -178,6 +178,17 @@ ApplicationSolar::~ApplicationSolar() {
 
 void ApplicationSolar::render() const {
 
+    glUseProgram(m_shaders.at("planet").handle);
+    for (int i = 0; i < planets_.size(); ++i) {
+        if (planets_[i]->getName() == "Light") { // we dont draw a planet or a ring if we have the light node
+            glm::mat4 light_transfrom = planets_[i]->getWorldTransform();
+            glUniform1f(m_shaders.at("planet").u_locs.at("light_intensity"),planets_[i]->getIntensity());
+            glUniform3f(m_shaders.at("planet").u_locs.at("light_pos"),light_transfrom[3][0],light_transfrom[3][1],light_transfrom[3][2]);
+            glUniform3f(m_shaders.at("planet").u_locs.at("color_diffuse_"),0.5f,0.5f,0.5f);
+            glUniform3f(m_shaders.at("planet").u_locs.at("color_specular_"),1,1,1);
+        }
+    }
+
     for (int i = 0; i < planets_.size(); ++i) {
         if (planets_[i]->getName() != "Light"){ // we dont draw a planet or a ring if we have the light node
 
@@ -205,11 +216,8 @@ void ApplicationSolar::render() const {
 
             //std::cout<< "Color: " << color[0] <<" " << color[1] <<" " << color[2] << "\n";
 
-            glUniform3f(m_shaders.at("planet").u_locs.at("light_pos"),0,0,0);
+            glUniform3f(m_shaders.at("planet").u_locs.at("camera_position"),m_view_transform[3][0],m_view_transform[3][1],m_view_transform[3][2]);
             glUniform3f(m_shaders.at("planet").u_locs.at("color_ambient_"),color[0],color[1],color[2]);
-            glUniform3f(m_shaders.at("planet").u_locs.at("color_diffuse_"),0.5f,0.5f,0.5f);
-            glUniform3f(m_shaders.at("planet").u_locs.at("color_specular_"),1,1,1);
-            //glUniform3f(m_shaders.at("planet").u_locs.at("pos"),1,1,1);
 
             // draw bound vertex array using bound shader
             glDrawElements(planets_[i]->getGeometry().draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
@@ -331,10 +339,12 @@ void ApplicationSolar::initializeShaderPrograms() {
     m_shaders.at("planet").u_locs["ProjectionMatrix"] = -1;
 
     m_shaders.at("planet").u_locs["light_pos"] = -1;
+    m_shaders.at("planet").u_locs["light_intensity"] = -1;
     m_shaders.at("planet").u_locs["color_ambient_"] = -1;
     m_shaders.at("planet").u_locs["color_diffuse_"] = -1;
     m_shaders.at("planet").u_locs["color_specular_"] = -1;
-    m_shaders.at("planet").u_locs["camera_pos"] = -1;
+    m_shaders.at("planet").u_locs["camera_position"] = -1;
+    m_shaders.at("planet").u_locs["toon_shading"] = -1;
 
 
     // store shader program objects in container
@@ -406,25 +416,23 @@ void ApplicationSolar::keyCallback(int key, int action, int mods) {
     if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
         // moving ahead
         m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, -speed});
-        uploadView();
-    } else if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+    }  if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
         // moving backwards
         m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, speed});
-        uploadView();
-    } else if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+    }  if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
         // movement to the left
         m_view_transform = glm::translate(m_view_transform, glm::fvec3{-speed, 0.0f, 0.0f});
-        uploadView();
-    } else if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
+    }  if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
         // movement to the right
         m_view_transform = glm::translate(m_view_transform, glm::fvec3{speed, 0.0f, 0.0f});
-        uploadView();
-    }/*/
-    std::cout<<"Mat\n";
-    std::cout<<m_view_transform[0][0]<< " " <<m_view_transform[0][1]<< " " << m_view_transform[0][2] << " " << m_view_transform[0][3] <<"\n";
-    std::cout<<m_view_transform[1][0]<< " " <<m_view_transform[1][1]<< " " << m_view_transform[1][2] << " " << m_view_transform[1][3] <<"\n";
-    std::cout<<m_view_transform[2][0]<< " " <<m_view_transform[2][1]<< " " << m_view_transform[2][2] << " " << m_view_transform[2][3] <<"\n";
-    std::cout<<m_view_transform[3][0]<< " " <<m_view_transform[3][1]<< " " << m_view_transform[3][2] << " " << m_view_transform[3][3] <<"\n";/**/
+    }
+    uploadView();
+    glUseProgram(m_shaders.at("planet").handle);
+    if (key == GLFW_KEY_1) {
+        glUniform1b(m_shaders.at("planet").u_locs.at("toon_shading"),true);
+    }else if (key == GLFW_KEY_2){
+        glUniform1b(m_shaders.at("planet").u_locs.at("toon_shading"),false);
+    }
 }
 
 //handle delta mouse movement input

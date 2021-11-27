@@ -64,8 +64,6 @@ protected:
     // camera projection matrix
     glm::fmat4 m_view_projection;
     // root Node (contains camera)
-
-
 };
 
 #endif

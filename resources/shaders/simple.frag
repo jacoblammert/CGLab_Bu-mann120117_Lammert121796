@@ -31,8 +31,7 @@ void main() {
     vec3 H = normalize(L + V);
 
     float angle_specular = max(dot(H, N), 0.0);
-    out_Color = vec4((color_ambient_ + color_diffuse_ * max(dot(N, L), 0)) + color_specular_ * pow(max(dot(N,H),0),20), 1.0);
-
+    out_Color = vec4((color_ambient_ + color_diffuse_ * max(dot(N, L), 0)) + color_specular_ * pow(max(dot(N,H),0),30), 1.0);
     if (out_Color[0]<0){
         out_Color[0] = 0;
     }
@@ -43,9 +42,16 @@ void main() {
         out_Color[2] = 0;
     }
 
+    // if toonshading:
+    /**/
+    float stroke_thickness = 0.4;
+    float normal_dir = dot(N,V);
+    if (-stroke_thickness < normal_dir && normal_dir < stroke_thickness){
+        out_Color = vec4(1.0f,1.0f,1.0f,1);
+    }
     float layers = 5.0f;
     out_Color *= layers;
     out_Color[0] = int(out_Color[0]) / layers;
     out_Color[1] = int(out_Color[1]) / layers;
-    out_Color[2] = int(out_Color[2]) / layers;
+    out_Color[2] = int(out_Color[2]) / layers;/**/
  }

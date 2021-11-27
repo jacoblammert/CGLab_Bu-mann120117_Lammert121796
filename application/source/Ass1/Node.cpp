@@ -135,7 +135,7 @@ glm::fmat4 Node::calculateLocalTransform() {
     // rotation around the center (sun)
     model_matrix = glm::rotate(glm::fmat4{}, float((2 * 3.14 * glfwGetTime()) / pow(localTransform_[0][3]+1,3)), glm::fvec3{0.0f, 1.0f, 0.0f});
 
-    std::cout<<"value: " << localTransform_[0][3] << "\n";
+    //std::cout<<"value: " << localTransform_[0][3] << "\n";
 
     // translation
     model_matrix = glm::translate(model_matrix,

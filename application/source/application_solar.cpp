@@ -207,7 +207,7 @@ void ApplicationSolar::render() const {
 
             glUniform3f(m_shaders.at("planet").u_locs.at("light_pos"),0,0,0);
             glUniform3f(m_shaders.at("planet").u_locs.at("color_ambient_"),color[0],color[1],color[2]);
-            glUniform3f(m_shaders.at("planet").u_locs.at("color_diffuse_"),1,1,1);
+            glUniform3f(m_shaders.at("planet").u_locs.at("color_diffuse_"),0.5f,0.5f,0.5f);
             glUniform3f(m_shaders.at("planet").u_locs.at("color_specular_"),1,1,1);
             //glUniform3f(m_shaders.at("planet").u_locs.at("pos"),1,1,1);
 
@@ -402,23 +402,29 @@ void ApplicationSolar::initializeGeometry() {
 ///////////////////////////// callback functions for window events ////////////
 // handle key input
 void ApplicationSolar::keyCallback(int key, int action, int mods) {
+    float speed = 0.1f;
     if (key == GLFW_KEY_W && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
         // moving ahead
-        m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, -0.1f});
+        m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, -speed});
         uploadView();
     } else if (key == GLFW_KEY_S && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
         // moving backwards
-        m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, 0.1f});
+        m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.0f, 0.0f, speed});
         uploadView();
     } else if (key == GLFW_KEY_A && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
         // movement to the left
-        m_view_transform = glm::translate(m_view_transform, glm::fvec3{-0.1f, 0.0f, 0.0f});
+        m_view_transform = glm::translate(m_view_transform, glm::fvec3{-speed, 0.0f, 0.0f});
         uploadView();
     } else if (key == GLFW_KEY_D && (action == GLFW_PRESS || action == GLFW_REPEAT)) {
         // movement to the right
-        m_view_transform = glm::translate(m_view_transform, glm::fvec3{0.1f, 0.0f, 0.0f});
+        m_view_transform = glm::translate(m_view_transform, glm::fvec3{speed, 0.0f, 0.0f});
         uploadView();
-    }
+    }/*/
+    std::cout<<"Mat\n";
+    std::cout<<m_view_transform[0][0]<< " " <<m_view_transform[0][1]<< " " << m_view_transform[0][2] << " " << m_view_transform[0][3] <<"\n";
+    std::cout<<m_view_transform[1][0]<< " " <<m_view_transform[1][1]<< " " << m_view_transform[1][2] << " " << m_view_transform[1][3] <<"\n";
+    std::cout<<m_view_transform[2][0]<< " " <<m_view_transform[2][1]<< " " << m_view_transform[2][2] << " " << m_view_transform[2][3] <<"\n";
+    std::cout<<m_view_transform[3][0]<< " " <<m_view_transform[3][1]<< " " << m_view_transform[3][2] << " " << m_view_transform[3][3] <<"\n";/**/
 }
 
 //handle delta mouse movement input

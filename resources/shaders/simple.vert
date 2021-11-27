@@ -38,12 +38,14 @@ void main(void)
 	//center_planet = vec3((ProjectionMatrix  * ViewMatrix * ModelMatrix) * vec4(0,0,0, 1.0));
 	pass_Normal = normalize(vec3(NormalMatrix * vec4(in_Normal, 0.0)));
 
-	center_system = vec3(ViewMatrix * vec4(0,0,0, 1.0));
-    camera_position  = vec3(ProjectionMatrix * ViewMatrix * vec4(1.0, 1.0, 1.0, 1.0));
+	center_system = vec3(0,0,0);
 
-	pass_Position = gl_Position;
+	mat4 original_view_mat = inverse(ViewMatrix);
+    camera_position  = vec3(original_view_mat[3][0],original_view_mat[3][1],original_view_mat[3][2]);
 
-    light_pos_out = vec3(ViewMatrix * vec4(light_pos, 1.0));
+	pass_Position = ModelMatrix * vec4(in_Position, 1.0);
+    pass_Normal = normalize(vec3(pass_Position - ModelMatrix * vec4(0,0,0,1)));
+    light_pos_out = vec3(0,0,0);
 
     color_ambient_ = color_ambient;
     color_diffuse_ = color_diffuse;

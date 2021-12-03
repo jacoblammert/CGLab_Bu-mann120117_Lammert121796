@@ -2,6 +2,7 @@
 
 in vec3 pass_Normal;
 in vec4 pass_Position;
+in vec3 pass_Normal_planet;
 
 uniform vec3 light_pos;
 uniform float light_intensity; // vec3(ambient, diffuse, specular) or float?
@@ -13,7 +14,8 @@ uniform vec3 color_specular_;// specular part of the light
 uniform bool toon_shading;
 
 out vec4 out_Color;
-
+uniform sampler2D texture_;
+//uniform sampler2D texture_normal;
 
 void main() {
     // do light caculation
@@ -28,7 +30,14 @@ void main() {
     float angle_specular = max(dot(H, pass_Normal), 0.0f); // specular angle
     float angle_diffuse = max(dot(pass_Normal, L), 0.0f); // diffuse angle
     // light calculations:
-    out_Color = vec4((color_ambient_ + light_intensity * color_diffuse_ * angle_diffuse) + light_intensity * color_specular_ * pow(angle_specular,30), 1.0);
+
+    vec2 horizontal = normalize(vec2(pass_Normal[0],pass_Normal_planet[2]));
+
+    float hor = atan(dot(horizontal,vec2(0,1)),horizontal[0])/(3.142f * 2) + 0.5f;
+    float ver = asin(pass_Normal_planet.y)/3.142f + 0.5f;
+    vec4 color = texture(texture_,vec2(hor,ver));
+
+    out_Color = vec4((color.rgb + light_intensity * color_diffuse_ * angle_diffuse) + light_intensity * color_specular_ * pow(angle_specular,30), 1.0);
 
     if (toon_shading){ // toon shading boolean
         float stroke_thickness = 0.4; // angle of grey area

@@ -31,3 +31,11 @@ model_object GeometryNode::getTrail() {
 void GeometryNode::setTrail(model_object model) {
     trail_ = model;
 }
+
+void GeometryNode::setTexture(texture_object texture) {
+    texture_ = texture;
+}
+
+texture_object GeometryNode::getTexture() {
+    return texture_;
+}

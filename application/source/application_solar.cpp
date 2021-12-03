@@ -24,6 +24,7 @@ using namespace gl;
 
 #include <iostream>
 #include <random>
+#include <texture_loader.hpp>
 
 
 ApplicationSolar::ApplicationSolar(std::string const &resource_path)
@@ -130,6 +131,7 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
     load_planets();
     generate_trails();
     generate_stars();
+    load_textures();
 }
 
 
@@ -201,7 +203,7 @@ void ApplicationSolar::render() const {
                                1, GL_FALSE, glm::value_ptr(model_matrix));
 
             // bind the VAO to draw
-            glBindVertexArray(planets_[i]->getGeometry().vertex_AO);
+            glBindVertexArray(planet_object.vertex_AO);
 
             std::vector<float> color = planets_[i]->getColor();
 
@@ -211,6 +213,21 @@ void ApplicationSolar::render() const {
             glUniform3f(m_shaders.at("planet").u_locs.at("color_ambient_"),color[0],color[1],color[2]);
 
             // draw bound vertex array using bound shader
+
+
+            // bind the VAO to draw
+            glBindVertexArray(planet_object.vertex_AO);
+
+            texture_object texture = planets_[i]->getTexture();
+
+            //std::cout<< "Planet: " << planets_[i]->getName()<<"\n";
+
+            glActiveTexture(GL_TEXTURE1 + i);
+            glBindTexture(texture.target, texture.handle);
+            // add sampler
+            GLint sampler_location = glGetUniformLocation(m_shaders.at("planet").handle, "texture_");
+            glUniform1i(sampler_location, texture.handle);
+
             glDrawElements(planets_[i]->getGeometry().draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
 
 
@@ -335,6 +352,8 @@ void ApplicationSolar::initializeShaderPrograms() {
     m_shaders.at("planet").u_locs["color_specular_"] = -1;
     m_shaders.at("planet").u_locs["camera_position"] = -1;
     m_shaders.at("planet").u_locs["toon_shading"] = -1;
+    m_shaders.at("planet").u_locs["texture_"] = -1;
+    //m_shaders.at("planet").u_locs["texture_normal"] = -1;
 
 
     // store shader program objects in container
@@ -396,7 +415,7 @@ void ApplicationSolar::initializeGeometry() {
     planet_object.draw_mode = GL_TRIANGLES;
     // transfer number of indices to model object
     planet_object.num_elements = GLsizei(planet_model.indices.size());
-}
+    }
 
 ///////////////////////////// callback functions for window events ////////////
 // handle key input
@@ -573,6 +592,40 @@ void ApplicationSolar::generate_trails() {
         std::cout << ring_object.vertex_BO << "\n";
         std::cout << ring_object.num_elements << "\n";
         std::cout << ring_object.element_BO << "\n";
+    }
+}
+
+void ApplicationSolar::load_textures() {
+
+
+    for (int i = 0; i < planets_.size(); i++) {
+        if (planets_[i]->getName() != "Light") {
+
+            std::cout<< "Loading planet: " << planets_[i]->getName() << "\n";
+            pixel_data planet_texture = texture_loader::file(m_resource_path + "textures/" + planets_[i]->getName() + ".png");
+            //pixel_data planet_texture = texture_loader::file(m_resource_path + "textures/Mars_normal.png");
+
+            GLenum channel_type = planet_texture.channel_type;
+
+            glActiveTexture(GL_TEXTURE1 + i);
+            texture_object texture;
+            glGenTextures(1, &texture.handle);
+            texture.target = GL_TEXTURE_2D;
+
+            planets_[i]->setTexture(texture);
+
+            glBindTexture(texture.target, texture.handle);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, planet_texture.channels, (GLsizei) planet_texture.width, (GLsizei) planet_texture.height,
+                         0, planet_texture.channels, channel_type, planet_texture.ptr());
+            std::cout<<"Setting texture\n";
+        }
     }
 }
 

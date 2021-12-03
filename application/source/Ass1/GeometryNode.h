@@ -18,9 +18,13 @@ public:
     model_object getTrail();
     void setTrail(model_object model);
 
+    void setTexture(texture_object texture);
+    texture_object getTexture();
+
 private:
     model_object geometry_;
     model_object trail_;
+    texture_object texture_;
 
 };
 

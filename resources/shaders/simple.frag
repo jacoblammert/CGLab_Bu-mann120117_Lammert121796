@@ -11,6 +11,7 @@ uniform vec3 camera_position;
 uniform vec3 color_diffuse_; // color of the planet
 uniform vec3 color_specular_;// specular part of the light
 uniform bool toon_shading;
+uniform bool sun;
 
 out vec4 out_Color;
 uniform sampler2D texture_;
@@ -54,6 +55,10 @@ void main() {
 
 
     out_Color = vec4((color.rgb * 0.1f + light_intensity * color.rgb * angle_diffuse) + max(dot(pass_Normal, L) + 0.25f, 0.0f) * light_intensity * color_specular_ * pow(angle_specular,30), 1.0);
+
+    if (sun){
+        out_Color = color;
+    }
 
     if (toon_shading){ // toon shading boolean
         float stroke_thickness = 0.4; // angle of grey area

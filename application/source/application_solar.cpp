@@ -196,6 +196,10 @@ void ApplicationSolar::render() const {
             glUseProgram(m_shaders.at("planet").handle);
             // loop over all planets, draw each one
 
+            glUniform1b(m_shaders.at("planet").u_locs.at("sun"),false);
+            if (planets_[i]->getName() == "Sun"){
+                glUniform1b(m_shaders.at("planet").u_locs.at("sun"),true);
+            }
             glm::fmat4 model_matrix = planets_[i]->getWorldTransform(); // the model matrix will return the matrix with our world transform
             // -> more calculations than necessary, but its simpler to implement
 
@@ -365,6 +369,7 @@ void ApplicationSolar::initializeShaderPrograms() {
     m_shaders.at("planet").u_locs["color_specular_"] = -1;
     m_shaders.at("planet").u_locs["camera_position"] = -1;
     m_shaders.at("planet").u_locs["toon_shading"] = -1;
+    m_shaders.at("planet").u_locs["sun"] = -1;
     m_shaders.at("planet").u_locs["texture_"] = -1;
     m_shaders.at("planet").u_locs["texture_normal"] = -1;
 
@@ -648,7 +653,7 @@ void ApplicationSolar::load_textures() {
             if (inputFile.good()) {
                 normal_texture = texture_loader::file(m_resource_path + "textures/" + planets_[i]->getName() + "_normal.png");
             } else {
-                normal_texture = texture_loader::file(m_resource_path + "textures/Earth_normal.png");
+                normal_texture = texture_loader::file(m_resource_path + "textures/Empty_normal.png");
             }
 
 

@@ -25,6 +25,7 @@ using namespace gl;
 #include <iostream>
 #include <random>
 #include <texture_loader.hpp>
+#include <fstream>
 
 
 ApplicationSolar::ApplicationSolar(std::string const &resource_path)
@@ -187,7 +188,7 @@ void ApplicationSolar::render() const {
             glUniform3f(m_shaders.at("planet").u_locs.at("color_specular_"),1,1,1); // specular color of the light
         }
     }
-
+    int count = 0;
     for (int i = 0; i < planets_.size(); ++i) {
         if (planets_[i]->getName() != "Light"){ // we dont draw a planet or a ring if we have the light node
 
@@ -210,7 +211,7 @@ void ApplicationSolar::render() const {
             //std::cout<< "Color: " << color[0] <<" " << color[1] <<" " << color[2] << "\n";
 
             glUniform3f(m_shaders.at("planet").u_locs.at("camera_position"),m_view_transform[3][0],m_view_transform[3][1],m_view_transform[3][2]);
-            glUniform3f(m_shaders.at("planet").u_locs.at("color_ambient_"),color[0],color[1],color[2]);
+            //glUniform3f(m_shaders.at("planet").u_locs.at("color_ambient_"),color[0],color[1],color[2]);
 
             // draw bound vertex array using bound shader
 
@@ -222,11 +223,24 @@ void ApplicationSolar::render() const {
 
             //std::cout<< "Planet: " << planets_[i]->getName()<<"\n";
 
-            glActiveTexture(GL_TEXTURE1 + i);
+            glActiveTexture(GL_TEXTURE1 + count);
+            count++;
             glBindTexture(texture.target, texture.handle);
             // add sampler
-            GLint sampler_location = glGetUniformLocation(m_shaders.at("planet").handle, "texture_");
-            glUniform1i(sampler_location, texture.handle);
+
+            glUniform1i(glGetUniformLocation(m_shaders.at("planet").handle, "texture_"), texture.handle);
+
+
+            texture_object texture_normal = planets_[i]->getTextureNormal();
+
+            //std::cout<< "Planet: " << planets_[i]->getName()<<"\n";
+
+            glActiveTexture(GL_TEXTURE1 + count);
+            count++;
+            glBindTexture(texture_normal.target, texture_normal.handle);
+            // add sampler
+
+            glUniform1i(glGetUniformLocation(m_shaders.at("planet").handle, "texture_normal"), texture_normal.handle);
 
             glDrawElements(planets_[i]->getGeometry().draw_mode, planet_object.num_elements, model::INDEX.type, NULL);
 
@@ -243,7 +257,7 @@ void ApplicationSolar::render() const {
                 float dist = (float) sqrt(pow(local[0][3],2) + pow(local[1][3],2) + pow(local[2][3],2)); // distance to the origin of rotation (dist to planet it rotates around)
 
                 glUniform1f(m_shaders.at("ring").u_locs.at("dist"),dist); // distance from the planet to its origin of rotation
-
+                glUniform1f(m_shaders.at("ring").u_locs.at("angle"),-float((0.02f * 3.14 * glfwGetTime()) / pow(local[0][3]+1,3)));
 
 
                 model_matrix = planets_[i]->getParent()->getParent()->getWorldTransform(); // world transform of the parent planet = parent parent nodes world transform
@@ -347,13 +361,12 @@ void ApplicationSolar::initializeShaderPrograms() {
 
     m_shaders.at("planet").u_locs["light_pos"] = -1;
     m_shaders.at("planet").u_locs["light_intensity"] = -1;
-    m_shaders.at("planet").u_locs["color_ambient_"] = -1;
     m_shaders.at("planet").u_locs["color_diffuse_"] = -1;
     m_shaders.at("planet").u_locs["color_specular_"] = -1;
     m_shaders.at("planet").u_locs["camera_position"] = -1;
     m_shaders.at("planet").u_locs["toon_shading"] = -1;
     m_shaders.at("planet").u_locs["texture_"] = -1;
-    //m_shaders.at("planet").u_locs["texture_normal"] = -1;
+    m_shaders.at("planet").u_locs["texture_normal"] = -1;
 
 
     // store shader program objects in container
@@ -373,6 +386,7 @@ void ApplicationSolar::initializeShaderPrograms() {
     m_shaders.at("ring").u_locs["ViewMatrix"] = -1;
     m_shaders.at("ring").u_locs["ProjectionMatrix"] = -1;
     m_shaders.at("ring").u_locs["dist"] = -1;
+    m_shaders.at("ring").u_locs["angle"] = -1;
 
 }
 
@@ -537,7 +551,7 @@ void ApplicationSolar::generate_trails() {
     model_object ring_object;
     std::vector<GLfloat> data;
 
-    int resolution = 100;
+    int resolution = 1000;
     data.reserve(resolution * 6 * sizeof(float));
 
     for (int i = 0; i < resolution; ++i) {
@@ -554,9 +568,9 @@ void ApplicationSolar::generate_trails() {
 
         //float brightness = 0.4f;
 
-        float r = 1;//(float) i / (float) resolution;
-        float g = 1;//(float) i / (float) resolution;
-        float b = 1;//(float) i / (float) resolution;
+        float r = 1-(float) i / (float) resolution;
+        float g = 1-(float) i / (float) resolution;
+        float b = 1-(float) i / (float) resolution;
 
         // Color
         data.push_back(r);
@@ -597,17 +611,18 @@ void ApplicationSolar::generate_trails() {
 
 void ApplicationSolar::load_textures() {
 
-
+    int count = 0;
     for (int i = 0; i < planets_.size(); i++) {
         if (planets_[i]->getName() != "Light") {
-
+/**/
             std::cout<< "Loading planet: " << planets_[i]->getName() << "\n";
             pixel_data planet_texture = texture_loader::file(m_resource_path + "textures/" + planets_[i]->getName() + ".png");
             //pixel_data planet_texture = texture_loader::file(m_resource_path + "textures/Mars_normal.png");
 
             GLenum channel_type = planet_texture.channel_type;
 
-            glActiveTexture(GL_TEXTURE1 + i);
+            glActiveTexture(GL_TEXTURE1 + count);
+            count++;
             texture_object texture;
             glGenTextures(1, &texture.handle);
             texture.target = GL_TEXTURE_2D;
@@ -624,7 +639,40 @@ void ApplicationSolar::load_textures() {
 
             glTexImage2D(GL_TEXTURE_2D, 0, planet_texture.channels, (GLsizei) planet_texture.width, (GLsizei) planet_texture.height,
                          0, planet_texture.channels, channel_type, planet_texture.ptr());
-            std::cout<<"Setting texture\n";
+            std::cout<<"Loading normals\n";
+/**/
+            pixel_data normal_texture;
+
+            std::ifstream inputFile(m_resource_path + "textures/" + planets_[i]->getName() + "_normal.png");
+
+            if (inputFile.good()) {
+                normal_texture = texture_loader::file(m_resource_path + "textures/" + planets_[i]->getName() + "_normal.png");
+            } else {
+                normal_texture = texture_loader::file(m_resource_path + "textures/Earth_normal.png");
+            }
+
+
+            glActiveTexture(GL_TEXTURE1 + count);
+            count++;
+            texture_object texture_normal;
+            glGenTextures(1, &texture_normal.handle);
+            texture_normal.target = GL_TEXTURE_2D;
+
+            planets_[i]->setTextureNormal(texture_normal);
+
+            glBindTexture(texture_normal.target, texture_normal.handle);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+            glTexImage2D(GL_TEXTURE_2D, 0, normal_texture.channels, (GLsizei) normal_texture.width, (GLsizei) normal_texture.height,
+                         0, normal_texture.channels, normal_texture.channel_type, normal_texture.ptr());
+
+
+
         }
     }
 }

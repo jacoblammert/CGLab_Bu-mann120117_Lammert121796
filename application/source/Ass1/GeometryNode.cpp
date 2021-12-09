@@ -39,3 +39,11 @@ void GeometryNode::setTexture(texture_object texture) {
 texture_object GeometryNode::getTexture() {
     return texture_;
 }
+
+void GeometryNode::setTextureNormal(texture_object texture) {
+    texture_normal_ = texture;
+}
+
+texture_object GeometryNode::getTextureNormal() {
+    return texture_normal_;
+}

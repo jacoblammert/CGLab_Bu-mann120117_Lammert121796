@@ -39,6 +39,8 @@ protected:
 
     void load_textures();
 
+    void load_skybox();
+
     void generate_stars();
 
     void generate_trails();
@@ -59,6 +61,11 @@ protected:
 
     // cpu representation of model
     model_object planet_object;
+
+    GLenum skybox_texture_index;
+    texture_object skybox_texture;
+
+    model_object skybox_model_object;
 
     // camera transform matrix
     glm::fmat4 m_view_transform;

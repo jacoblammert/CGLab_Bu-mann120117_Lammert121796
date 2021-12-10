@@ -133,6 +133,8 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
     generate_trails();
     generate_stars();
     load_textures();
+    std::cout<<"Textures loaded!"<<"\n";
+    load_skybox();
 }
 
 
@@ -184,7 +186,7 @@ void ApplicationSolar::render() const {
             glm::mat4 light_transfrom = planets_[i]->getWorldTransform(); // transform matrix of the light
             glUniform1f(m_shaders.at("planet").u_locs.at("light_intensity"),planets_[i]->getIntensity()); // intensity of the light
             glUniform3f(m_shaders.at("planet").u_locs.at("light_pos"),light_transfrom[3][0],light_transfrom[3][1],light_transfrom[3][2]); // position of the light
-            glUniform3f(m_shaders.at("planet").u_locs.at("color_diffuse_"),0.5f,0.5f,0.5f); // diffuse color of the light (setting caused memory access violation error earlier)
+            //glUniform3f(m_shaders.at("planet").u_locs.at("color_diffuse_"),0.5f,0.5f,0.5f); // diffuse color of the light (setting caused memory access violation error earlier)
             glUniform3f(m_shaders.at("planet").u_locs.at("color_specular_"),1,1,1); // specular color of the light
         }
     }
@@ -302,6 +304,25 @@ void ApplicationSolar::render() const {
         }
     }
 
+/**/
+    glDepthFunc(GL_EQUAL);
+    glUseProgram(m_shaders.at("skybox").handle);
+
+    // bind the VAO to draw
+    glBindVertexArray(skybox_model_object.vertex_AO);
+
+    glActiveTexture(skybox_texture_index);
+
+    // bind texture
+    glBindTexture(skybox_texture.target, skybox_texture.handle);
+
+    // add sampler
+    int samplerLocation = glGetUniformLocation(m_shaders.at("skybox").handle,"skybox_texture");
+    glUniform1i(samplerLocation, skybox_texture.handle);
+
+    // draw
+    glDrawArrays(GL_TRIANGLES, 0, skybox_model_object.num_elements);
+    glDepthFunc(GL_LESS);/**/
 
     glUseProgram(m_shaders.at("star").handle);
 
@@ -326,6 +347,10 @@ void ApplicationSolar::uploadView() {
     glUseProgram(m_shaders.at("ring").handle);
     glUniformMatrix4fv(m_shaders.at("ring").u_locs.at("ViewMatrix"),
                        1, GL_FALSE, glm::value_ptr(view_matrix));
+
+    glUseProgram(m_shaders.at("skybox").handle);
+    glUniformMatrix4fv(m_shaders.at("skybox").u_locs.at("ViewMatrix"),
+                       1, GL_FALSE, glm::value_ptr(view_matrix));
 }
 
 void ApplicationSolar::uploadProjection() {
@@ -341,6 +366,10 @@ void ApplicationSolar::uploadProjection() {
     // bind shader to which to upload unforms
     glUseProgram(m_shaders.at("ring").handle);
     glUniformMatrix4fv(m_shaders.at("ring").u_locs.at("ProjectionMatrix"),
+                       1, GL_FALSE, glm::value_ptr(m_view_projection));
+
+    glUseProgram(m_shaders.at("skybox").handle);
+    glUniformMatrix4fv(m_shaders.at("skybox").u_locs.at("ProjectionMatrix"),
                        1, GL_FALSE, glm::value_ptr(m_view_projection));
 }
 
@@ -365,7 +394,6 @@ void ApplicationSolar::initializeShaderPrograms() {
 
     m_shaders.at("planet").u_locs["light_pos"] = -1;
     m_shaders.at("planet").u_locs["light_intensity"] = -1;
-    m_shaders.at("planet").u_locs["color_diffuse_"] = -1;
     m_shaders.at("planet").u_locs["color_specular_"] = -1;
     m_shaders.at("planet").u_locs["camera_position"] = -1;
     m_shaders.at("planet").u_locs["toon_shading"] = -1;
@@ -392,6 +420,14 @@ void ApplicationSolar::initializeShaderPrograms() {
     m_shaders.at("ring").u_locs["ProjectionMatrix"] = -1;
     m_shaders.at("ring").u_locs["dist"] = -1;
     m_shaders.at("ring").u_locs["angle"] = -1;
+
+    // skybox shader
+    m_shaders.emplace("skybox", shader_program{{{GL_VERTEX_SHADER, m_resource_path + "shaders/skybox.vert"},
+                                                       {GL_FRAGMENT_SHADER, m_resource_path + "shaders/skybox.frag"}}});
+    // request uniform locations for shader program
+    m_shaders.at("skybox").u_locs["ProjectionMatrix"] = -1;
+    m_shaders.at("skybox").u_locs["ViewMatrix"] = -1;
+    m_shaders.at("skybox").u_locs["skybox_texture"] = -1;
 
 }
 
@@ -619,7 +655,6 @@ void ApplicationSolar::load_textures() {
     int count = 0;
     for (int i = 0; i < planets_.size(); i++) {
         if (planets_[i]->getName() != "Light") {
-/**/
             std::cout<< "Loading planet: " << planets_[i]->getName() << "\n";
             pixel_data planet_texture = texture_loader::file(m_resource_path + "textures/" + planets_[i]->getName() + ".png");
             //pixel_data planet_texture = texture_loader::file(m_resource_path + "textures/Mars_normal.png");
@@ -680,7 +715,188 @@ void ApplicationSolar::load_textures() {
 
         }
     }
+
+    skybox_texture_index = GL_TEXTURE1 + count;
 }
+
+void ApplicationSolar::load_skybox() {
+    /*/
+    model skybox_obj = model_loader::obj(m_resource_path + "models/skybox.obj", model::NORMAL);
+    //exit(0);
+
+
+
+
+    // generate vertex array object
+    glGenVertexArrays(1, &skybox.vertex_AO);
+    // bind the array for attaching buffers
+    glBindVertexArray(skybox.vertex_AO);
+
+    // generate generic buffer
+    glGenBuffers(1, &skybox.vertex_BO);
+    // bind this as an vertex array buffer containing all attributes
+    glBindBuffer(GL_ARRAY_BUFFER, skybox.vertex_BO);
+    // configure currently bound array buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * skybox_obj.data.size(), skybox_obj.data.data(), GL_STATIC_DRAW);
+
+    // activate first attribute on gpu
+    glEnableVertexAttribArray(0);
+    // first attribute is 3 floats with no offset & stride
+    glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, skybox_obj.vertex_bytes,
+                          skybox_obj.offsets[model::POSITION]);
+    // activate second attribute on gpu
+    glEnableVertexAttribArray(1);
+    // second attribute is 3 floats with no offset & stride
+    glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, skybox_obj.vertex_bytes,
+                          skybox_obj.offsets[model::NORMAL]);
+
+    // generate generic buffer
+    glGenBuffers(1, &skybox.element_BO);
+    // bind this as an vertex array buffer containing all attributes
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skybox.element_BO);
+    // configure currently bound array buffer
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * skybox_obj.indices.size(), skybox_obj.indices.data(),
+                 GL_STATIC_DRAW);
+
+    // store type of primitive to draw
+    skybox.draw_mode = GL_TRIANGLES;
+    // transfer number of indices to model object
+    skybox.num_elements = GLsizei(skybox_obj.indices.size());
+
+    // Copied code from initialize geometry and loaded cube instead of sphere
+
+
+
+
+
+    //auto skybox_node = std::make_shared<GeometryNode>("skybox", skybox_obj);
+
+    //auto skybox_node = std::make_shared<GeometryNode>(GeometryNode());
+
+    //skybox_node->setGeometry(skybox);
+    //skybox_node->setName("skybox");
+
+    //sceneGraph_->getRoot()->addChildren(skybox_node);
+    //skybox_node->setParent(sceneGraph_->getRoot());
+/**/
+
+
+
+    model skybox_model{};
+
+    std::vector<GLfloat> skybox = {
+
+            -1.0f, 1.0f, -1.0f,
+            -1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, 1.0f, -1.0f,
+            -1.0f, 1.0f, -1.0f,
+
+            -1.0f, -1.0f, 1.0f,
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, 1.0f, -1.0f,
+            -1.0f, 1.0f, -1.0f,
+            -1.0f, 1.0f, 1.0f,
+            -1.0f, -1.0f, 1.0f,
+
+            1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+
+            -1.0f, -1.0f, 1.0f,
+            -1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f,
+            -1.0f, -1.0f, 1.0f,
+
+            -1.0f, 1.0f, -1.0f,
+            1.0f, 1.0f, -1.0f,
+            1.0f, 1.0f, 1.0f,
+            1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f, 1.0f,
+            -1.0f, 1.0f, -1.0f,
+
+            -1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f, 1.0f,
+            1.0f, -1.0f, -1.0f,
+            1.0f, -1.0f, -1.0f,
+            -1.0f, -1.0f, 1.0f,
+            1.0f, -1.0f, 1.0f
+    };
+
+    skybox_model.data = skybox;
+    skybox_model.vertex_num = skybox.size();
+
+
+
+
+
+
+
+
+    glGenVertexArrays(1, &skybox_model_object.vertex_AO);
+    glBindVertexArray(skybox_model_object.vertex_AO);
+
+    glGenBuffers(1, &skybox_model_object.vertex_BO);
+    glBindBuffer(GL_ARRAY_BUFFER, skybox_model_object.vertex_BO);
+
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * skybox.size(), skybox.data(), GL_STATIC_DRAW);
+
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, GLsizei(3 * sizeof(float)), 0);
+
+
+    skybox_model_object.draw_mode = GL_TRIANGLES;
+    skybox_model_object.num_elements = GLsizei(skybox.size());
+
+
+
+
+
+
+    // loading textures
+
+    texture_object skybox_texture_object;
+    pixel_data skybox_texture_side;
+
+
+    glActiveTexture(skybox_texture_index);
+
+    glGenTextures(1, &skybox_texture_object.handle);
+    skybox_texture_object.target = GL_TEXTURE_CUBE_MAP;
+    skybox_texture = skybox_texture_object;
+    glBindTexture(skybox_texture_object.target, skybox_texture_object.handle);
+
+    std::vector<std::string> names = {"negx", "posx", "posy", "negy", "posz", "negz"};
+
+    for (int i = 0; i < names.size(); ++i) {
+        skybox_texture_side = texture_loader::file(m_resource_path + "textures/" + names[i] + ".png");
+
+        if(skybox_texture_side.ptr()) {
+            glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, skybox_texture_side.channels, skybox_texture_side.width,
+                         skybox_texture_side.height, 0, skybox_texture_side.channels, skybox_texture_side.channel_type,
+                         skybox_texture_side.ptr());
+        }else {
+            std::cout<<"Error loading skymap for "<<i<<" face.\n";
+        }
+    }
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+
+    std::cout<<"Skybox loaded!\n";
+
+}/**/
 
 // exe entry point
 int main(int argc, char *argv[]) {

@@ -115,7 +115,7 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
     moon->setParent(moon_node);
 
 
-    moon->setName("Moon"); // set the name for the moon (to draw it)
+    moon->setName("Earth"); // set the name for the moon (to draw it)
 
 
     moon->setColor({1,1,0.7f});
@@ -870,7 +870,7 @@ void ApplicationSolar::load_skybox() {
     glGenTextures(1, &skybox_texture_object.handle);
     skybox_texture_object.target = GL_TEXTURE_CUBE_MAP;
     skybox_texture = skybox_texture_object;
-    glBindTexture(skybox_texture_object.target, skybox_texture_object.handle);
+    glBindTexture(skybox_texture.target, skybox_texture.handle); // mit diesem einfachen Trick werden die Texturen (fast richtig) angezeigt, informatiker hassen ihn -> HIER KLICKEN <- zum kaufen
 
     std::vector<std::string> names = {"negx", "posx", "posy", "negy", "posz", "negz"};
 

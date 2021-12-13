@@ -65,7 +65,7 @@ protected:
     GLenum skybox_texture_index;
     texture_object skybox_texture;
 
-    model_object skybox_model_object;
+    model_object skybox_object;
 
     // camera transform matrix
     glm::fmat4 m_view_transform;

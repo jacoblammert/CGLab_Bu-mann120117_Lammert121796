@@ -719,7 +719,7 @@ void ApplicationSolar::load_textures() {
 
 void ApplicationSolar::load_skybox() {
     /*/
-    model skybox_obj = model_loader::obj(m_resource_path + "models/skybox.obj", model::POSITION);
+    model skybox_obj = model_loader::obj(m_resource_path + "models/cube.obj", model::POSITION);
     //exit(0);
 
 
@@ -762,7 +762,7 @@ void ApplicationSolar::load_skybox() {
 
     // Copied code from initialize geometry and loaded cube instead of sphere
 
-/**/
+/*/
 
 
 

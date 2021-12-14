@@ -39,7 +39,7 @@ protected:
 
     void load_textures();
 
-    void load_skybox();
+    void generate_skybox();
 
     void generate_stars();
 
@@ -58,6 +58,8 @@ protected:
 
     // upload view matrix
     void uploadView();
+
+    void loadSkyboxTextures(std::string name);
 
     // cpu representation of model
     model_object planet_object;

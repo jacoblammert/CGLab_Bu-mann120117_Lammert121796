@@ -134,7 +134,7 @@ ApplicationSolar::ApplicationSolar(std::string const &resource_path)
     generate_stars();
     load_textures();
     std::cout<<"Textures loaded!"<<"\n";
-    load_skybox();
+    generate_skybox();
 }
 
 
@@ -495,6 +495,14 @@ void ApplicationSolar::keyCallback(int key, int action, int mods) {
     }else if (key == GLFW_KEY_2){
         // if 2 is pressed, we only use the normal shading
         glUniform1b(m_shaders.at("planet").u_locs.at("toon_shading"),false);
+    }else if (key == GLFW_KEY_3){
+        loadSkyboxTextures("");
+    }else if (key == GLFW_KEY_4){
+        loadSkyboxTextures(" (2)");
+    }else if (key == GLFW_KEY_5){
+        loadSkyboxTextures("1");
+    }else if (key == GLFW_KEY_6){
+        loadSkyboxTextures("2");
     }
 }
 
@@ -717,145 +725,79 @@ void ApplicationSolar::load_textures() {
     skybox_texture_index = GL_TEXTURE1 + count;
 }
 
-void ApplicationSolar::load_skybox() {
-    /*/
-    model skybox_obj = model_loader::obj(m_resource_path + "models/cube.obj", model::POSITION);
-    //exit(0);
+/**
+ * Loades the points of the triangles first and then calls the function to load the skybox texture
+ */
+void ApplicationSolar::generate_skybox() {
 
 
+    std::vector<GLfloat> skybox_points = std::vector<GLfloat>(); // We will load all points from this file line by line
+    skybox_points.reserve(108 * sizeof(GLfloat)); // we have 3 values for each point, 3 Points per triangle and 2 Triangles per side (6 Sides)
+    std::ifstream skybox_file(m_resource_path + "models/skybox_points.txt"); // We store each point one by one
 
+    // The order of the points is from: https://amin-ahmadi.com/2019/07/28/creating-a-skybox-using-c-qt-and-opengl/
 
-    // generate vertex array object
-    glGenVertexArrays(1, &skybox_object.vertex_AO);
-    // bind the array for attaching buffers
-    glBindVertexArray(skybox_object.vertex_AO);
-
-    // generate generic buffer
-    glGenBuffers(1, &skybox_object.vertex_BO);
-    // bind this as an vertex array buffer containing all attributes
-    glBindBuffer(GL_ARRAY_BUFFER, skybox_object.vertex_BO);
-    // configure currently bound array buffer
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * skybox_obj.data.size(), skybox_obj.data.data(), GL_STATIC_DRAW);
-
-    // activate first attribute on gpu
-    glEnableVertexAttribArray(0);
-    // first attribute is 3 floats with no offset & stride
-    glVertexAttribPointer(0, model::POSITION.components, model::POSITION.type, GL_FALSE, skybox_obj.vertex_bytes,
-                          skybox_obj.offsets[model::POSITION]);
-    // activate second attribute on gpu
-    //glEnableVertexAttribArray(1);
-    // second attribute is 3 floats with no offset & stride
-    //glVertexAttribPointer(1, model::NORMAL.components, model::NORMAL.type, GL_FALSE, skybox_obj.vertex_bytes,skybox_obj.offsets[model::NORMAL]);
-
-    // generate generic buffer
-    glGenBuffers(1, &skybox_object.element_BO);
-    // bind this as an vertex array buffer containing all attributes
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, skybox_object.element_BO);
-    // configure currently bound array buffer
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, model::INDEX.size * skybox_obj.indices.size(), skybox_obj.indices.data(),
-                 GL_STATIC_DRAW);
-
-    // store type of primitive to draw
-    skybox_object.draw_mode = GL_TRIANGLES;
-    // transfer number of indices to model object
-    skybox_object.num_elements = GLsizei(skybox_obj.indices.size());
-
-    // Copied code from initialize geometry and loaded cube instead of sphere
-
-/*/
-
+    while(!skybox_file.eof()) {
+        float x, y ,z;
+        skybox_file>>x>>y>>z; // put the by space separated values into x y and z
+        skybox_points.push_back((GLfloat)x); // push back to vector
+        skybox_points.push_back((GLfloat)y); // push back to vector
+        skybox_points.push_back((GLfloat)z); // push back to vector
+    }
 
 
     model skybox_model{};
-
-    std::vector<GLfloat> skybox = {
-
-            -1.0f, 1.0f, -1.0f,
-            -1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, 1.0f, -1.0f,
-            -1.0f, 1.0f, -1.0f,
-
-            -1.0f, -1.0f, 1.0f,
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, 1.0f, -1.0f,
-            -1.0f, 1.0f, -1.0f,
-            -1.0f, 1.0f, 1.0f,
-            -1.0f, -1.0f, 1.0f,
-
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-
-            -1.0f, -1.0f, 1.0f,
-            -1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, -1.0f, 1.0f,
-            -1.0f, -1.0f, 1.0f,
-
-            -1.0f, 1.0f, -1.0f,
-            1.0f, 1.0f, -1.0f,
-            1.0f, 1.0f, 1.0f,
-            1.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f, 1.0f,
-            -1.0f, 1.0f, -1.0f,
-
-            -1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f, 1.0f,
-            1.0f, -1.0f, -1.0f,
-            1.0f, -1.0f, -1.0f,
-            -1.0f, -1.0f, 1.0f,
-            1.0f, -1.0f, 1.0f
-    };
-
-    skybox_model.data = skybox;
-    skybox_model.vertex_num = skybox.size()/3;
+    skybox_model.data = skybox_points;                  // store points in vector
+    skybox_model.vertex_num = skybox_points.size()/3;   // set number of vertices
 
 
     glGenVertexArrays(1, &skybox_object.vertex_AO);
-    glBindVertexArray(skybox_object.vertex_AO);
+    glBindVertexArray(skybox_object.vertex_AO);         // generate and bind vertex array
 
     glGenBuffers(1, &skybox_object.vertex_BO);
     glBindBuffer(GL_ARRAY_BUFFER, skybox_object.vertex_BO);
 
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * skybox.size(), skybox.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * skybox_points.size(), skybox_points.data(), GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, GLsizei(3 * sizeof(float)), 0);
 
 
     skybox_object.draw_mode = GL_TRIANGLES;
-    skybox_object.num_elements = GLsizei(skybox.size());
-/**/
+    skybox_object.num_elements = GLsizei(skybox_points.size());
 
     // loading textures
 
-    pixel_data skybox_texture_side;
-
-
-    glActiveTexture(skybox_texture_index);
+    glActiveTexture(skybox_texture_index);          // activating the texture (important)
 
     glGenTextures(1, &skybox_texture.handle);
-    skybox_texture.target = GL_TEXTURE_CUBE_MAP; // we draw a cubemap
+    skybox_texture.target = GL_TEXTURE_CUBE_MAP;    // we draw a cubemap
 
-    glBindTexture(skybox_texture.target, skybox_texture.handle); // mit diesem einfachen Trick werden die Texturen (fast richtig) angezeigt, informatiker hassen ihn -> HIER KLICKEN <- zum kaufen
+    glBindTexture(skybox_texture.target, skybox_texture.handle); // Binding the texture
+
+    loadSkyboxTextures("");
+}
+
+/**
+ * Loads the specified texture
+ * @param name of the texture (left.png -> name = " ",  left_123.png -> name = "_123")
+ */
+void ApplicationSolar::loadSkyboxTextures(std::string name) {
+
+    pixel_data skybox_texture_side;
+    glActiveTexture(skybox_texture_index);          // activating the texture (important)
 
     // generated by: https://tools.wwwtyro.net/space-3d/index.html
     std::vector<std::string> direction = {"right", "left", "bottom", "top", "front", "back"}; // right order for the textures
 
-    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE); // Parameters for the skybox
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
     for (int i = 0; i < direction.size(); ++i) {
-        skybox_texture_side = texture_loader::file(m_resource_path + "textures/" + direction[i] + " (2).png");
+        skybox_texture_side = texture_loader::file(m_resource_path + "textures/" + direction[i] + name +".png");
 
         if(skybox_texture_side.ptr()) {
             glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, skybox_texture_side.channels, skybox_texture_side.width,
@@ -865,12 +807,7 @@ void ApplicationSolar::load_skybox() {
             std::cout<<"Error loading skymap for "<<i<<" face.\n";
         }
     }
-
-
-
-    std::cout<<"Skybox loaded!\n";
-
-}/**/
+}
 
 // exe entry point
 int main(int argc, char *argv[]) {

@@ -34,6 +34,10 @@ public:
 
     model_object stars_;
 
+    model_object screenquad_object;
+
+    //framebuffer_object framebuffer_obj;
+
 protected:
     void load_planets();
 
@@ -44,6 +48,8 @@ protected:
     void generate_stars();
 
     void generate_trails();
+
+    void generate_screen();
 
 
     void initializeShaderPrograms();
@@ -68,6 +74,12 @@ protected:
     texture_object skybox_texture;
 
     model_object skybox_object;
+
+    bool initialize_framebuffer(unsigned width, unsigned height);
+
+    unsigned screen_width;
+    unsigned screen_height;
+    framebuffer_object framebuffer_obj;
 
     // camera transform matrix
     glm::fmat4 m_view_transform;

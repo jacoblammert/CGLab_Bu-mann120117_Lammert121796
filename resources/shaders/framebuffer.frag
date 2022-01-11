@@ -29,16 +29,17 @@ void main() {
     if (gaussian_blur){
         float pixel_size_x = 1.0f / textureSize.x;
         float pixel_size_y = 1.0f / textureSize.x;
-        out_Color += texture(screenTexture, tex_coords + vec2(pixel_size_x,0));     // pixel right
-        out_Color += texture(screenTexture, tex_coords - vec2(pixel_size_x,0));     // pixel left
-        out_Color += texture(screenTexture, tex_coords + vec2(0,pixel_size_y));     // pixel above
-        out_Color += texture(screenTexture, tex_coords - vec2(0,pixel_size_y));     // pixel below
+        out_Color *= 4;
+        out_Color += texture(screenTexture, tex_coords + vec2(pixel_size_x,0)) * 2;     // pixel right
+        out_Color += texture(screenTexture, tex_coords - vec2(pixel_size_x,0)) * 2;     // pixel left
+        out_Color += texture(screenTexture, tex_coords + vec2(0,pixel_size_y)) * 2;     // pixel above
+        out_Color += texture(screenTexture, tex_coords - vec2(0,pixel_size_y)) * 2;     // pixel below
 
         out_Color += texture(screenTexture, tex_coords + vec2(-pixel_size_x,-pixel_size_y)); // pixel above left
         out_Color += texture(screenTexture, tex_coords + vec2(pixel_size_x,-pixel_size_y));  // pixel below right
         out_Color += texture(screenTexture, tex_coords + vec2(-pixel_size_x,pixel_size_y));  // pixel above left
         out_Color += texture(screenTexture, tex_coords + vec2(pixel_size_x,pixel_size_y));   // pixel above right
-        out_Color /= 9;
+        out_Color /= 16;
     }
 
 	if(luminance_preserving_greyscale) {

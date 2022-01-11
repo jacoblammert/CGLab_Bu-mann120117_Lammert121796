@@ -72,7 +72,7 @@ protected:
 
     GLenum skybox_texture_index;
     int skybox_counter_ = 0;
-    texture_object skybox_texture;
+
 
     model_object skybox_object;
 
@@ -84,6 +84,8 @@ protected:
 
     std::vector<GLboolean> post_processing_effects_ = {false, false, false, false};
     std::vector<GLenum> skybox_texturers_ = {};
+    std::vector<texture_object> skybox_texturer_objects = {};
+    int active_skybox_texture_object = 0;
 
     // camera transform matrix
     glm::fmat4 m_view_transform;

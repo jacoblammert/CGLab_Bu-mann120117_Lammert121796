@@ -45,12 +45,12 @@ struct shader_program {
 
 // framebuffer attachments and handle
 struct framebuffer_object {
+
+    //texture attachment
+    texture_object texture_obj;
+
     // handle of framebuffer object
     GLuint handle = 0;
-
-    //color attachment
-    texture_object texture_obj;
-    GLuint texture_handle = 0;
 
     //renderbuffer attachment
     GLuint renderbuffer_handle;

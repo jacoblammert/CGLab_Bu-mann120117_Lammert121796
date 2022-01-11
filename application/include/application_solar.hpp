@@ -34,7 +34,7 @@ public:
 
     model_object stars_;
 
-    model_object screenquad_object;
+    model_object full_screenquad_;
 
     //framebuffer_object framebuffer_obj;
 
@@ -71,15 +71,19 @@ protected:
     model_object planet_object;
 
     GLenum skybox_texture_index;
+    int skybox_counter_ = 0;
     texture_object skybox_texture;
 
     model_object skybox_object;
 
-    bool initialize_framebuffer(unsigned width, unsigned height);
+    bool generate_framebuffer(unsigned width, unsigned height);
 
     unsigned screen_width;
     unsigned screen_height;
-    framebuffer_object framebuffer_obj;
+    framebuffer_object framebuffer_object_;
+
+    std::vector<GLboolean> post_processing_effects_ = {false, false, false, false};
+    std::vector<GLenum> skybox_texturers_ = {};
 
     // camera transform matrix
     glm::fmat4 m_view_transform;
